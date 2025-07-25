@@ -1,0 +1,17 @@
+{
+  "name": "dart_backend",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "flutter run -d chrome --web-renderer html",
+    "build": "dart run build_runner watch --delete-conflicting-outputs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
