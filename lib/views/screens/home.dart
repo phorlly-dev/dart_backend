@@ -48,8 +48,9 @@ class HomeScreen extends StatelessWidget {
       }),
       button: IconButton(
         onPressed: () => taskForm(context),
-        icon: Icon(Icons.add),
+        icon: Icon(Icons.create_new_folder_rounded),
         autofocus: true,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }

@@ -24,21 +24,24 @@ class Task implements DbModel {
     );
   }
 
-  factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
-  Map<String, dynamic> toJson() => _$TaskToJson(this);
+  // factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+  // Map<String, dynamic> toJson() => _$TaskToJson(this);
 
   /// sqflite uses 0/1 for booleans
   @override
-  Task fromMap(Map<String, dynamic> map) => Task(
-    id: map['id'] as int?,
-    title: map['title'] as String,
-    done: (map['done'] as int) == 1,
-  );
+  Task fromMap(Map<String, dynamic> map) => _$TaskFromJson(map);
+
+  //  Task(
+  //   id: map['id'] as int?,
+  //   title: map['title'] as String,
+  //   done: (map['done'] as int) == 1,
+  // );
 
   @override
-  Map<String, dynamic> toMap() => {
-    if (id != null) 'id': id,
-    'title': title,
-    'done': done ? 1 : 0,
-  };
+  Map<String, dynamic> toMap() => _$TaskToJson(this);
+  //  {
+  //   if (id != null) 'id': id,
+  //   'title': title,
+  //   'done': done ? 1 : 0,
+  // };
 }

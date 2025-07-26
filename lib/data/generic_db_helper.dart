@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 /// 1️⃣ Define a contract for any model you want to persist:
 ///    – needs a zero-arg constructor or factory fromMap,
 ///    – must be able to turn itself into a Map<String,dynamic>.
-abstract interface class DbModel {
+abstract class DbModel {
   /// Build a model from a DB row.
   DbModel fromMap(Map<String, dynamic> map);
 

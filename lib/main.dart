@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dart_backend/app.dart';
 import 'package:dart_backend/data/task_db_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -12,12 +14,15 @@ Future<void> main() async {
 
   // 1️⃣ Initialize the correct databaseFactory
   if (kIsWeb) {
-    // on web: this comes from sqflite_common_ffi_web
+    // Web uses the IndexedDB shim
     databaseFactory = databaseFactoryFfiWeb;
-  } else {
-    // on mobile/desktop: initialize the ffi loader
+  } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    // Desktop uses ffi
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+  } else {
+    // Mobile (Android/iOS) — don't touch databaseFactory!
+    // sqflite's default platform‐channel factory will be used.
   }
 
   // 2️⃣ Load .env (if you’re using flutter_dotenv)
