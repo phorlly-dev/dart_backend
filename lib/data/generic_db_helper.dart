@@ -1,78 +1,69 @@
 // lib/data/generic_db_helper.dart
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'database_provider.dart';
 
-/// 1️⃣ Define a contract for any model you want to persist:
-///    – needs a zero-arg constructor or factory fromMap,
-///    – must be able to turn itself into a Map<String,dynamic>.
+/// Contract your models must implement.
 abstract class DbModel {
-  /// Build a model from a DB row.
+  /// Every model needs to be able to turn a DB row into itself.
   DbModel fromMap(Map<String, dynamic> map);
 
-  /// Turn a model into a row.
+  /// …and itself into a row map.
   Map<String, dynamic> toMap();
 }
 
-/// 2️⃣ Create a generic, reusable base helper:
+/// A reusable base class—just extend this, pass your table‐name, DDL, and a "blank" model.
 abstract class GenericDbHelper<T extends DbModel> {
-  static Database? _database;
-
-  /// Subclasses just tell us:
-  ///  • which table
-  ///  • how to create it
-  ///  • and how to map back & forth
-  String get table;
-  String get createTable;
-  T get model; // used to call fromMap
-
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-
-    final dbPath = await getDatabasesPath();
-    final dbName = dotenv.env['DB_NAME']!;
-    final query = dotenv.env[createTable]!;
-    final path = join(dbPath, dbName);
-    _database = await openDatabase(
-      path,
-      version: int.parse(dotenv.env['DB_VERSION'] ?? '1'),
-      onCreate: (db, version) => db.execute(query),
-    );
-    return _database!;
+  GenericDbHelper() {
+    // automatically register this table for creation
+    DatabaseProvider.instance.registerTable(createTableSql);
   }
 
+  /// The actual table name in SQLite.
+  String get tableName;
+
+  /// The CREATE TABLE statement for this model.
+  String get createTableSql;
+
+  /// A “blank” instance so we can call `fromMap`.
+  T get blankModel;
+
+  /// Syntactic sugar: the shared Database instance.
+  Future<Database> get database async =>
+      await DatabaseProvider.instance.database;
+
+  /// CREATE → returns the model with its new `id` populated.
   Future<T> make(T model) async {
     final db = await database;
-    final id = await db.insert(table, model.toMap());
-    final fullMap = {...model.toMap(), 'id': id};
-    return model.fromMap(fullMap) as T;
+    final id = await db.insert(tableName, model.toMap());
+    final full = {...model.toMap(), 'id': id};
+    return blankModel.fromMap(full) as T;
   }
 
-  Future<List<T>> list() async {
+  /// READ ALL → sorted descending by ID by default
+  Future<List<T>> list({String orderBy = 'id DESC'}) async {
     final db = await database;
-    final rows = await db.query(table, orderBy: 'id DESC');
-    return rows.map((r) => model.fromMap(r) as T).toList();
+    final rows = await db.query(tableName, orderBy: orderBy);
+    return rows.map((r) => blankModel.fromMap(r) as T).toList();
   }
 
+  /// READ ONE → by primary key
   Future<T?> retrieve(int id) async {
     final db = await database;
-    final rows = await db.query(table, where: 'id = ?', whereArgs: [id]);
+    final rows = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
     if (rows.isEmpty) return null;
-    return model.fromMap(rows.first) as T;
+    return blankModel.fromMap(rows.first) as T;
   }
 
+  /// UPDATE → returns number of rows affected
   Future<int> release(T model) async {
     final db = await database;
-    return db.update(
-      table,
-      model.toMap(),
-      where: 'id = ?',
-      whereArgs: [model.toMap()['id']],
-    );
+    final data = model.toMap();
+    return db.update(tableName, data, where: 'id = ?', whereArgs: [data['id']]);
   }
 
+  /// DELETE → by primary key
   Future<int> destoy(int id) async {
     final db = await database;
-    return db.delete(table, where: 'id = ?', whereArgs: [id]);
+    return db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 }

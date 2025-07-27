@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:dart_backend/app.dart';
+import 'package:dart_backend/data/database_provider.dart';
 import 'package:dart_backend/data/task_db_helper.dart';
+import 'package:dart_backend/data/user_db_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,8 +30,13 @@ Future<void> main() async {
   // 2️⃣ Load .env (if you’re using flutter_dotenv)
   await dotenv.load(fileName: ".env");
 
+  // 3️⃣ register all table DDL
+  TaskDbHelper(); // registers tasks table
+  UserDbHelper(); // registers users table
+
   // 3️⃣ Force DB creation before the UI starts
-  await TaskDbHelper().database;
+  // Force the database to open (and create all registered tables)
+  await DatabaseProvider.instance.database;
 
   //ScreenUtil
   await ScreenUtil.ensureScreenSize();
