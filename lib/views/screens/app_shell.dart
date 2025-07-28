@@ -1,30 +1,55 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/views/screens/auth.dart';
 import 'package:dart_backend/views/screens/home.dart';
+import 'package:dart_backend/views/screens/params.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AppShellScreen extends StatelessWidget {
   const AppShellScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  Future<Params?> _loadParams() async {
     final auth = Get.find<AuthController>();
 
-    return Obx(() {
-      // 1️⃣ still loading?
-      if (auth.isLoading.value) {
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
-      }
+    // 1️⃣ If we already have someone in memory, go straight to them:
+    final inMemory = auth.currentUser.value;
+    if (inMemory != null) {
+      return Params(info: inMemory);
+    }
 
-      // 2️⃣ no user or not “remembered” → show login
-      final user = auth.currentUser.value;
-      if (user == null) {
-        return const AuthScreen();
-      }
+    // 2️⃣ Otherwise try the persistent remember-me logic:
+    final me = await auth.tryAutoLogin();
+    if (me == null) return null;
 
-      // 3️⃣ otherwise we have a remembered user → home
-      return HomeScreen(user: user);
-    });
+    final args = Get.arguments;
+    if (args is Params) {
+      return args;
+    } else if (args is Map) {
+      return Params(info: args['info']);
+    }
+    return Params(info: me);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Params?>(
+      future: _loadParams(),
+      builder: (ctx, snap) {
+        // still loading…
+        if (snap.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final params = snap.data;
+        // no user → show Auth
+        if (params == null || params.info == null) {
+          return const AuthScreen();
+        }
+        // logged in → show Home
+        return HomeScreen(user: params.info!);
+      },
+    );
   }
 }

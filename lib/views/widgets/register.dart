@@ -1,15 +1,12 @@
-import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/models/user.dart';
-import 'package:dart_backend/utils/toastification.dart';
 import 'package:dart_backend/views/widgets/auth_form.dart';
 import 'package:dart_backend/views/widgets/input_form.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class RegisterForm extends StatefulWidget {
-  final AuthController controller;
+  final Future<void> Function(User req) onSubmit;
 
-  const RegisterForm({super.key, required this.controller});
+  const RegisterForm({super.key, required this.onSubmit});
 
   @override
   State<RegisterForm> createState() => _RegisterFormState();
@@ -21,7 +18,6 @@ class _RegisterFormState extends State<RegisterForm> {
   late final TextEditingController _name;
   late final TextEditingController _password;
   late final TextEditingController _confirm;
-  late final AuthController _controller;
 
   bool _visPass = true;
   bool _visConPass = true;
@@ -29,7 +25,6 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller;
     _email = TextEditingController();
     _password = TextEditingController();
     _confirm = TextEditingController();
@@ -45,38 +40,6 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  void _submit(BuildContext context) async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final email = _email.text.trim();
-    final name = _name.text.trim();
-    final password = _password.text;
-    final req = User(name: name, email: email, password: password, role: true);
-
-    await _controller.register(req);
-    if (context.mounted) {
-      if (_controller.errorMessage.value.isNotEmpty) {
-        showToast(
-          context,
-          type: Toast.error,
-          title: 'Register Failed!',
-          message: _controller.errorMessage.value,
-        );
-        debugPrint('Errors: ${_controller.errorMessage.value}');
-      } else {
-        final tabController = DefaultTabController.of(context);
-        if (tabController.index != 0) {
-          tabController.animateTo(0);
-          showToast(
-            context,
-            title: 'Registration successful!',
-            message: 'Please log in.',
-          );
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AuthForm(
@@ -87,15 +50,31 @@ class _RegisterFormState extends State<RegisterForm> {
         _passwordField(),
         _confirmPasswordField(),
         const SizedBox(height: 28),
-        Obx(
-          () => ElevatedButton(
-            onPressed: () => _submit(context),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-            ),
-            child: _controller.isLoading.value
-                ? const CircularProgressIndicator()
-                : const Text('Register'),
+        ElevatedButton.icon(
+          onPressed: () {
+            if (!_formKey.currentState!.validate()) return;
+
+            // Build the request
+            final name = _name.text.trim();
+            final email = _email.text.trim();
+            final password = _password.text;
+
+            // Build the model here
+            final req = User(
+              name: name,
+              email: email,
+              password: password,
+              role: false,
+            );
+
+            // And hand it off to the parent
+            widget.onSubmit(req);
+            _formKey.currentState!.reset();
+          },
+          icon: const Icon(Icons.app_registration_rounded),
+          label: const Text("Register"),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
           ),
         ),
         const SizedBox(height: 24),
@@ -117,7 +96,7 @@ class _RegisterFormState extends State<RegisterForm> {
     label: 'Full Name',
     icon: Icons.person,
     autofocus: true,
-    validator: (v) => (v?.length ?? 0) == 0 ? 'The full name is requied' : null,
+    validator: (v) => (v?.isNotEmpty ?? false) ? null : 'Required',
   );
 
   Widget _passwordField() => InputForm(

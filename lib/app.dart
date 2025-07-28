@@ -1,6 +1,7 @@
 import 'package:dart_backend/controllers/task_controller.dart';
 import 'package:dart_backend/controllers/user_controller.dart';
 import 'package:dart_backend/views/screens/app_shell.dart';
+import 'package:dart_backend/views/screens/auth.dart';
 import 'package:dart_backend/views/screens/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       getPages: [
         GetPage(name: '/app-shell', page: () => const AppShellScreen()),
+        GetPage(name: '/auth', page: () => const AuthScreen()),
       ],
       theme: ThemeData.light(), // Default light theme
       darkTheme: ThemeData.dark(), // Dark theme

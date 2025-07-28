@@ -20,6 +20,7 @@ class AuthForm extends StatelessWidget {
           ),
           child: Form(
             key: formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(mainAxisSize: MainAxisSize.min, children: children),
           ),
         ),

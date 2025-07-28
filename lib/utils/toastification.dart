@@ -39,6 +39,7 @@ void showToast(
       toastification.showError(
         context: ctx,
         title: title,
+        autoCloseDuration: Duration(seconds: 6),
         description: message,
       );
   }

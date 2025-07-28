@@ -14,8 +14,10 @@ class AuthController extends GetxController {
 
   /// REGISTER
   Future<void> register(User req) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
     try {
-      isLoading.value = true;
       final hashed = hashPwd(req.password);
       final safed = req.copyWith(password: hashed);
       final created = await _repo.register(safed);
@@ -30,22 +32,27 @@ class AuthController extends GetxController {
   }
 
   /// LOGIN
-  Future<void> login(LoginRequest req, bool rememberMe) async {
+  Future<User?> login(LoginRequest req, bool rememberMe) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
     try {
-      isLoading.value = true;
       final res = await _repo.login(req, remember: rememberMe);
       if (res == null) {
         errorMessage.value = 'Invalid email or password';
-        return;
       }
 
       currentUser.value = res;
       errorMessage.value = '';
+
+      return currentUser.value;
     } catch (e) {
       errorMessage.value = 'Login failed: $e';
     } finally {
       isLoading.value = false;
     }
+
+    return null;
   }
 
   /// LOGOUT
@@ -55,16 +62,14 @@ class AuthController extends GetxController {
   }
 
   ///AUTO LOGIN
-  Future<void> _tryAutoLogin() async {
+  Future<User?> tryAutoLogin() async {
     final res = await _helper.getRememberedUser();
     if (res != null) {
       currentUser.value = res;
-    }
-  }
 
-  @override
-  void onInit() {
-    super.onInit();
-    _tryAutoLogin();
+      return currentUser.value;
+    }
+
+    return null;
   }
 }

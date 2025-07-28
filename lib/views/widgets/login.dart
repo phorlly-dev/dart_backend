@@ -1,6 +1,7 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/models/login_request.dart';
 import 'package:dart_backend/utils/toastification.dart';
+import 'package:dart_backend/views/screens/params.dart';
 import 'package:dart_backend/views/widgets/auth_form.dart';
 import 'package:dart_backend/views/widgets/input_form.dart';
 import 'package:flutter/material.dart';
@@ -39,23 +40,56 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void _submit(BuildContext context) async {
+    // 1️⃣ Validate form
     if (!_formKey.currentState!.validate()) return;
 
+    // 2️⃣ Prepare request
     final email = _email.text.trim();
     final password = _password.text;
     final req = LoginRequest(email: email, password: password);
 
-    await _controller.login(req, _rememberMe);
-    if (_controller.errorMessage.value.isNotEmpty && context.mounted) {
+    try {
+      // 3️⃣ Attempt login
+      final me = await _controller.login(req, _rememberMe);
+
+      // 4️⃣ **After** login, read the updated state
+      final err = _controller.errorMessage.value;
+      final user = _controller.currentUser.value;
+
+      if (!context.mounted) return;
+
+      // 5️⃣ Branch on success vs. failure
+      if (user == null || me == null) {
+        // Login failed
+        showToast(
+          context,
+          type: Toast.error,
+          title: 'Login Failed!',
+          message: err.isNotEmpty ? err : 'Unknown error',
+        );
+        _password.clear();
+        debugPrint('Login errors: $err');
+      } else {
+        Get.offAllNamed('/app-shell', arguments: Params(info: user));
+
+        // Login succeeded
+        showToast(
+          context,
+          autoClose: 5,
+          title: 'Welcome!',
+          message: 'You have successfully logged in.',
+        );
+
+        _formKey.currentState!.reset();
+      }
+    } catch (e) {
+      debugPrint('Login exception: $e');
       showToast(
         context,
         type: Toast.error,
-        title: 'Login Failed!',
-        message: _controller.errorMessage.value,
+        title: 'Error',
+        message: 'Something went wrong. Please try again.',
       );
-      debugPrint('Errors: ${_controller.errorMessage.value}');
-    } else {
-      Get.offAllNamed('/app-shell');
     }
   }
 
@@ -90,15 +124,13 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
         const SizedBox(height: 24),
-        Obx(
-          () => ElevatedButton(
-            onPressed: () => _submit(context),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size.fromHeight(48),
-            ),
-            child: _controller.isLoading.value
-                ? const CircularProgressIndicator()
-                : const Text('Log In'),
+        ElevatedButton.icon(
+          // 1) disable while loading
+          onPressed: () => _submit(context),
+          icon: const Icon(Icons.login_rounded),
+          label: const Text("Log In"),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
           ),
         ),
         const SizedBox(height: 24),
@@ -113,14 +145,14 @@ class _LoginFormState extends State<LoginForm> {
     inputType: TextInputType.emailAddress,
     autofocus: true,
     validator: (v) =>
-        (v?.contains('@') ?? false) ? null : 'Enter a valid email',
+        (v != null && v.contains('@')) ? null : 'Enter a valid email',
   );
 
   Widget _passwordField() => InputForm(
     controller: _password,
     label: 'Password',
     icon: Icons.lock,
-    validator: (v) => (v?.length ?? 0) >= 6 ? null : 'Min 6 characters',
+    validator: (v) => (v != null && v.length >= 6) ? null : 'Min 6 characters',
     obscureText: _passwordVisible,
     visibleText: () => setState(() => _passwordVisible = !_passwordVisible),
   );

@@ -12,6 +12,7 @@ class InputForm extends StatelessWidget {
   final TextInputType? inputType;
   final VoidCallback? visibleText;
   final double? width;
+  final void Function(String value)? onChanged;
 
   const InputForm({
     super.key,
@@ -29,6 +30,7 @@ class InputForm extends StatelessWidget {
     this.inputType = TextInputType.text,
     this.visibleText,
     this.width = .8,
+    this.onChanged,
   });
 
   @override
@@ -39,6 +41,8 @@ class InputForm extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
+        obscuringCharacter: '*',
+        onChanged: onChanged,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,

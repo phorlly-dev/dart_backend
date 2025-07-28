@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/utils/animations.dart';
+import 'package:dart_backend/utils/toastification.dart';
 import 'package:dart_backend/views/widgets/login.dart';
 import 'package:dart_backend/views/widgets/register.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,42 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: TabBarView(
                       children: [
                         LoginForm(controller: _controller),
-                        RegisterForm(controller: _controller),
+                        Builder(
+                          builder: (ctx) {
+                            return RegisterForm(
+                              onSubmit: (req) async {
+                                // 1️⃣ perform registration
+                                await _controller.register(req);
+
+                                // 2️⃣ read updated state
+                                final err = _controller.errorMessage.value;
+                                final me = _controller.currentUser.value;
+
+                                if (!ctx.mounted) return;
+
+                                if (me == null) {
+                                  // error
+                                  Get.snackbar(
+                                    'Register Failed',
+                                    err.isNotEmpty ? err : 'Unknown error',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                  );
+                                } else {
+                                  // switch back to Login tab
+                                  DefaultTabController.of(ctx).animateTo(0);
+
+                                  // show toast in the right Scaffold
+                                  showToast(
+                                    ctx,
+                                    autoClose: 5,
+                                    title: 'Registered',
+                                    message: 'Please log in.',
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
