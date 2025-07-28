@@ -1,8 +1,8 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/models/user.dart';
+import 'package:dart_backend/utils/toastification.dart';
 import 'package:dart_backend/views/widgets/auth_form.dart';
 import 'package:dart_backend/views/widgets/input_form.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -51,36 +51,29 @@ class _RegisterFormState extends State<RegisterForm> {
     final email = _email.text.trim();
     final name = _name.text.trim();
     final password = _password.text;
-
     final req = User(name: name, email: email, password: password, role: true);
 
-    try {
-      await _controller.register(req);
-      if (context.mounted) {
-        if (_controller.currentUser.value != null) {
-          // 🎯 SWITCH TO LOGIN TAB
-          final tabController = DefaultTabController.of(context);
-          if (tabController.index != 0) {
-            tabController.animateTo(0);
-          }
-          dispose();
-
-          // Optionally show a SnackBar to confirm
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration successful! Please log in.'),
-            ),
+    await _controller.register(req);
+    if (context.mounted) {
+      if (_controller.errorMessage.value.isNotEmpty) {
+        showToast(
+          context,
+          type: Toast.error,
+          title: 'Register Failed!',
+          message: _controller.errorMessage.value,
+        );
+        debugPrint('Errors: ${_controller.errorMessage.value}');
+      } else {
+        final tabController = DefaultTabController.of(context);
+        if (tabController.index != 0) {
+          tabController.animateTo(0);
+          showToast(
+            context,
+            title: 'Registration successful!',
+            message: 'Please log in.',
           );
-        } else {
-          // Optionally show a SnackBar to confirm
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_controller.errorMessage.value)),
-          );
-          debugPrint('Register errors: ${_controller.errorMessage.value}');
         }
       }
-    } catch (e) {
-      debugPrint('Register errors: $e');
     }
   }
 
@@ -94,14 +87,14 @@ class _RegisterFormState extends State<RegisterForm> {
         _passwordField(),
         _confirmPasswordField(),
         const SizedBox(height: 28),
-        ElevatedButton(
-          onPressed: () => _submit(context),
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-          child: Obx(
-            () => _controller.isLoading.value
-                ? const CupertinoActivityIndicator()
+        Obx(
+          () => ElevatedButton(
+            onPressed: () => _submit(context),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
+            child: _controller.isLoading.value
+                ? const CircularProgressIndicator()
                 : const Text('Register'),
           ),
         ),

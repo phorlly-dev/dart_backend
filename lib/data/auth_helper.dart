@@ -6,6 +6,7 @@ import 'package:dart_backend/utils/index.dart';
 abstract class AuthRepository {
   Future<User> register(User req);
   Future<User?> login(LoginRequest req, {bool remember = false});
+  Future<bool> logout(User req);
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -28,5 +29,15 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     return res;
+  }
+
+  @override
+  Future<bool> logout(User req) async {
+    if (req.remember) {
+      final cleared = req.copyWith(remember: false);
+      await helper.release(cleared);
+    }
+
+    return true;
   }
 }

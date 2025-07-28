@@ -18,9 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initApp() async {
-    await Future.delayed(
-      Duration(seconds: 3),
-    ).then((_) => Get.toNamed("/auth"));
+    await Future.delayed(const Duration(seconds: 3));
+    // either…
+    Get.offAllNamed('/app-shell');
   }
 
   @override

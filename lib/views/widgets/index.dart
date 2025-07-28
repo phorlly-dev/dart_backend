@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-Future<void> confirmDelete<T>({
+Future<T?> confirmDelete<T>({
   required String title,
   required VoidCallback onConfirm,
 }) {

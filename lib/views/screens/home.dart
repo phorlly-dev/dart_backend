@@ -1,5 +1,7 @@
+import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/controllers/task_controller.dart';
 import 'package:dart_backend/models/task.dart';
+import 'package:dart_backend/models/user.dart';
 import 'package:dart_backend/views/forms/task_from.dart';
 import 'package:dart_backend/views/widgets/body_content.dart';
 import 'package:dart_backend/views/widgets/data_table_view.dart';
@@ -9,14 +11,24 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final User? user;
+
+  const HomeScreen({super.key, this.user});
 
   @override
   Widget build(BuildContext context) {
     final TaskController ctrl = Get.find();
 
     return BodyContent(
-      header: NavBar(title: "Task"),
+      header: NavBar(
+        title: "Welcome, ${user!.name}",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => Get.find<AuthController>().logout(),
+          ),
+        ],
+      ),
       content: Obx(() {
         return DataTableView<Task>(
           items: ctrl.tasks,

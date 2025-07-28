@@ -1,5 +1,6 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/models/login_request.dart';
+import 'package:dart_backend/utils/toastification.dart';
 import 'package:dart_backend/views/widgets/auth_form.dart';
 import 'package:dart_backend/views/widgets/input_form.dart';
 import 'package:flutter/material.dart';
@@ -44,21 +45,17 @@ class _LoginFormState extends State<LoginForm> {
     final password = _password.text;
     final req = LoginRequest(email: email, password: password);
 
-    try {
-      await _controller.login(req, _rememberMe);
-      if (context.mounted) {
-        if (_controller.currentUser.value != null) {
-          Get.offAndToNamed('/home');
-        } else {
-          // Optionally show a SnackBar to confirm
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_controller.errorMessage.value)),
-          );
-          debugPrint('Register errors: ${_controller.errorMessage.value}');
-        }
-      }
-    } catch (e) {
-      debugPrint('Register errors: $e');
+    await _controller.login(req, _rememberMe);
+    if (_controller.errorMessage.value.isNotEmpty && context.mounted) {
+      showToast(
+        context,
+        type: Toast.error,
+        title: 'Login Failed!',
+        message: _controller.errorMessage.value,
+      );
+      debugPrint('Errors: ${_controller.errorMessage.value}');
+    } else {
+      Get.offAllNamed('/app-shell');
     }
   }
 
@@ -93,12 +90,16 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
         const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: () => _submit(context),
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
+        Obx(
+          () => ElevatedButton(
+            onPressed: () => _submit(context),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
+            child: _controller.isLoading.value
+                ? const CircularProgressIndicator()
+                : const Text('Log In'),
           ),
-          child: const Text('Log In'),
         ),
         const SizedBox(height: 24),
       ],

@@ -33,4 +33,17 @@ class UserDbHelper extends GenericDbHelper<User> {
 
     return blankModel.fromMap(rows.first);
   }
+
+  Future<User?> getRememberedUser() async {
+    final db = await database;
+    final rows = await db.query(
+      tableName,
+      where: 'remember = ?',
+      whereArgs: [1],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+
+    return blankModel.fromMap(rows.first);
+  }
 }
