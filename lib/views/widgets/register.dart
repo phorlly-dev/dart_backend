@@ -44,40 +44,34 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget build(BuildContext context) {
     return AuthForm(
       formKey: _formKey,
+      label: "Register",
+      icon: Icons.app_registration_rounded,
+      onPressed: () {
+        if (!_formKey.currentState!.validate()) return;
+
+        // Build the request
+        final name = _name.text.trim();
+        final email = _email.text.trim();
+        final password = _password.text;
+
+        // Build the model here
+        final req = User(
+          name: name,
+          email: email,
+          password: password,
+          role: false,
+        );
+
+        // And hand it off to the parent
+        widget.onSubmit(req);
+        _formKey.currentState!.reset();
+      },
       children: [
         _nameField(),
         _emailField(),
         _passwordField(),
         _confirmPasswordField(),
         const SizedBox(height: 28),
-        ElevatedButton.icon(
-          onPressed: () {
-            if (!_formKey.currentState!.validate()) return;
-
-            // Build the request
-            final name = _name.text.trim();
-            final email = _email.text.trim();
-            final password = _password.text;
-
-            // Build the model here
-            final req = User(
-              name: name,
-              email: email,
-              password: password,
-              role: false,
-            );
-
-            // And hand it off to the parent
-            widget.onSubmit(req);
-            _formKey.currentState!.reset();
-          },
-          icon: const Icon(Icons.app_registration_rounded),
-          label: const Text("Register"),
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-        ),
-        const SizedBox(height: 24),
       ],
     );
   }

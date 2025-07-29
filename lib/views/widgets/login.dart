@@ -1,7 +1,7 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/models/login_request.dart';
+import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/utils/toastification.dart';
-import 'package:dart_backend/views/screens/params.dart';
 import 'package:dart_backend/views/widgets/auth_form.dart';
 import 'package:dart_backend/views/widgets/input_form.dart';
 import 'package:flutter/material.dart';
@@ -48,48 +48,33 @@ class _LoginFormState extends State<LoginForm> {
     final password = _password.text;
     final req = LoginRequest(email: email, password: password);
 
-    try {
-      // 3️⃣ Attempt login
-      final me = await _controller.login(req, _rememberMe);
+    // 3️⃣ Attempt login
+    await _controller.login(req, _rememberMe);
 
-      // 4️⃣ **After** login, read the updated state
-      final err = _controller.errorMessage.value;
-      final user = _controller.currentUser.value;
+    // 4️⃣ **After** login, read the updated state
+    final err = _controller.errorMessage.value;
+    final me = _controller.currentUser.value;
 
-      if (!context.mounted) return;
+    if (!context.mounted) return;
 
-      // 5️⃣ Branch on success vs. failure
-      if (user == null || me == null) {
-        // Login failed
-        showToast(
-          context,
-          type: Toast.error,
-          title: 'Login Failed!',
-          message: err.isNotEmpty ? err : 'Unknown error',
-        );
-        _password.clear();
-        debugPrint('Login errors: $err');
-      } else {
-        Get.offAllNamed('/app-shell', arguments: Params(info: user));
-
-        // Login succeeded
-        showToast(
-          context,
-          autoClose: 5,
-          title: 'Welcome!',
-          message: 'You have successfully logged in.',
-        );
-
-        _formKey.currentState!.reset();
-      }
-    } catch (e) {
-      debugPrint('Login exception: $e');
+    // 5️⃣ Branch on success vs. failure
+    if (me == null && err.isNotEmpty) {
       showToast(
         context,
         type: Toast.error,
-        title: 'Error',
-        message: 'Something went wrong. Please try again.',
+        title: 'Authentication error!',
+        message: err,
       );
+      _password.clear();
+    } else {
+      Get.offAllNamed('/app-shell', arguments: Params(info: me));
+      showToast(
+        context,
+        title: 'Welcome!',
+        message: 'You have successfully logged in.',
+      );
+
+      _formKey.currentState!.reset();
     }
   }
 
@@ -123,18 +108,8 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
-        ElevatedButton.icon(
-          // 1) disable while loading
-          onPressed: () => _submit(context),
-          icon: const Icon(Icons.login_rounded),
-          label: const Text("Log In"),
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-        ),
-        const SizedBox(height: 24),
       ],
+      onPressed: () => _submit(context),
     );
   }
 

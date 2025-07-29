@@ -1,7 +1,7 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
+import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/views/screens/auth.dart';
 import 'package:dart_backend/views/screens/home.dart';
-import 'package:dart_backend/views/screens/params.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

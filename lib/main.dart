@@ -50,7 +50,7 @@ Future<void> main() async {
     ScreenUtilInit(
       designSize: Size(375, 812),
       minTextAdapt: true,
-      builder: (context, child) => const MainApp(),
+      builder: (_, __) => const MainApp(),
     ),
   );
 }

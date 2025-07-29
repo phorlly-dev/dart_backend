@@ -1,6 +1,7 @@
 import 'package:dart_backend/controllers/task_controller.dart';
 import 'package:dart_backend/models/task.dart';
-import 'package:dart_backend/views/widgets/form_submit.dart';
+import 'package:dart_backend/utils/toastification.dart';
+import 'package:dart_backend/views/functions/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,11 +34,15 @@ Future<void> taskForm(BuildContext context, {Task? task}) {
     ],
     store: () async {
       await ctrl.store(Task(title: title.text.trim(), done: done.value));
+      if (!context.mounted) return;
+      showToast(context, title: 'Task', message: 'The task saved.');
     },
     release: () async {
       await ctrl.change(
         task!.copyWith(title: title.text.trim(), done: done.value),
       );
+      if (!context.mounted) return;
+      showToast(context, title: 'Task', message: 'The task updated.');
     },
   );
 }

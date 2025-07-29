@@ -1,4 +1,5 @@
 import 'package:bcrypt/bcrypt.dart';
+import 'package:dart_backend/models/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// List of Background Images////
@@ -12,6 +13,12 @@ final bgList = [
   "assets/images/bg7.jpg",
   "assets/images/bg8.jpeg",
 ];
+
+class Params {
+  final User? info;
+
+  Params({this.info});
+}
 
 String hashPwd(String password) {
   final salt = BCrypt.gensalt(); // generates a random salt
@@ -31,4 +38,24 @@ String? setEnv(String name) {
   }
 
   return null;
+}
+
+String getInitials(String name) {
+  // 1) Remove any non-letter characters (like periods, commas, etc.)
+  final cleaned = name.replaceAll(RegExp(r'[^A-Za-z\s]'), '').trim();
+  if (cleaned.isEmpty) return '';
+
+  // 2) Split on whitespace
+  final parts = cleaned.split(RegExp(r'\s+'));
+
+  String initials;
+  if (parts.length >= 2) {
+    // Multi-word: first letter of first + first letter of last
+    initials = parts.first[0] + parts.last[0];
+  } else {
+    // Single word: first two letters (or just one, if it's only one letter long)
+    initials = parts.first.substring(0, parts.first.length.clamp(1, 2));
+  }
+
+  return initials.toUpperCase();
 }

@@ -2,10 +2,11 @@ import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/controllers/task_controller.dart';
 import 'package:dart_backend/models/task.dart';
 import 'package:dart_backend/models/user.dart';
-import 'package:dart_backend/views/forms/task_from.dart';
+import 'package:dart_backend/utils/index.dart';
+import 'package:dart_backend/views/functions/task_from.dart';
 import 'package:dart_backend/views/widgets/body_content.dart';
 import 'package:dart_backend/views/widgets/data_table_view.dart';
-import 'package:dart_backend/views/widgets/index.dart';
+import 'package:dart_backend/views/functions/index.dart';
 import 'package:dart_backend/views/widgets/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,14 @@ class HomeScreen extends StatelessWidget {
       header: NavBar(
         title: "Welcome, ${user!.name}",
         actions: [
+          CircleAvatar(
+            backgroundColor: Colors.blueGrey,
+            child: Text(
+              getInitials(user!.name),
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {

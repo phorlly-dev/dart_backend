@@ -2,9 +2,9 @@ import 'package:dart_backend/views/widgets/loading_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-typedef RowBuilder<T, int> = List<DataCell> Function(T item, int index);
-typedef ItemCallback<T> = void Function(T item);
-typedef SelectedPredicate<T> = bool Function(T item);
+typedef RowBuilder<T, int> = List<DataCell> Function(T, int);
+typedef ItemCallback<T> = void Function(T);
+typedef SelectedPredicate<T> = bool Function(T);
 
 class DataTableView<T> extends StatelessWidget {
   /// The data items to display
