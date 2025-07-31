@@ -36,7 +36,6 @@ class AuthForm extends StatelessWidget {
               children: [
                 ...children,
                 ElevatedButton.icon(
-                  // 1) disable while loading
                   onPressed: onPressed,
                   icon: Icon(icon ?? Icons.login_rounded),
                   label: Text(label ?? "Log In"),

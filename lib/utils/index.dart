@@ -59,3 +59,32 @@ String getInitials(String name) {
 
   return initials.toUpperCase();
 }
+
+
+        // return DataTableView<Task>(
+        //   items: ctrl.tasks,
+        //   isLoading: ctrl.isLoading.value,
+        //   hasError: ctrl.errorMessage.value,
+        //   notFound: ctrl.tasks,
+        //   isSelected: (t) => t.done,
+        //   columns: const [
+        //     DataColumn(label: Text('Id')),
+        //     DataColumn(label: Text('Title')),
+        //     DataColumn(label: Text('Done')),
+        //   ],
+        //   rowBuilder: (t, i) => [
+        //     DataCell(Text('${i + 1}')),
+        //     DataCell(Text(t.title)),
+        //     DataCell(
+        //       Checkbox(
+        //         value: t.done,
+        //         onChanged: (v) => ctrl.change(t.copyWith(done: v!)),
+        //       ),
+        //     ),
+        //   ],
+        //   onEdit: (t) => taskForm(context, task: t),
+        //   onDelete: (t) => confirmDelete<Task>(
+        //     title: t.title,
+        //     onConfirm: () async => await ctrl.remove(t.id!),
+        //   ),
+        // );

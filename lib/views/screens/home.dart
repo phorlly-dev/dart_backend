@@ -1,15 +1,9 @@
-import 'package:dart_backend/controllers/auth_controller.dart';
-import 'package:dart_backend/controllers/task_controller.dart';
-import 'package:dart_backend/models/task.dart';
 import 'package:dart_backend/models/user.dart';
-import 'package:dart_backend/utils/index.dart';
-import 'package:dart_backend/views/functions/task_from.dart';
 import 'package:dart_backend/views/widgets/body_content.dart';
-import 'package:dart_backend/views/widgets/data_table_view.dart';
-import 'package:dart_backend/views/functions/index.dart';
 import 'package:dart_backend/views/widgets/nav_bar.dart';
+import 'package:dart_backend/views/widgets/schedule.dart';
+import 'package:dart_backend/views/widgets/side_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
   final User? user;
@@ -18,64 +12,54 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TaskController ctrl = Get.find();
+    // final TaskController ctrl = Get.find();
 
     return BodyContent(
-      header: NavBar(
-        title: "Welcome, ${user!.name}",
-        actions: [
-          CircleAvatar(
-            backgroundColor: Colors.blueGrey,
-            child: Text(
-              getInitials(user!.name),
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Get.find<AuthController>().logout();
-              Get.offAllNamed('/auth');
-            },
-          ),
-        ],
-      ),
-      content: Obx(() {
-        return DataTableView<Task>(
-          items: ctrl.tasks,
-          isLoading: ctrl.isLoading.value,
-          hasError: ctrl.errorMessage.value,
-          notFound: ctrl.tasks,
-          isSelected: (t) => t.done,
-          columns: const [
-            DataColumn(label: Text('Id')),
-            DataColumn(label: Text('Title')),
-            DataColumn(label: Text('Done')),
-          ],
-          rowBuilder: (t, i) => [
-            DataCell(Text('${i + 1}')),
-            DataCell(Text(t.title)),
-            DataCell(
-              Checkbox(
-                value: t.done,
-                onChanged: (v) => ctrl.change(t.copyWith(done: v!)),
-              ),
-            ),
-          ],
-          onEdit: (t) => taskForm(context, task: t),
-          onDelete: (t) => confirmDelete<Task>(
-            title: t.title,
-            onConfirm: () async => await ctrl.remove(t.id!),
-          ),
-        );
-      }),
-      button: IconButton(
-        onPressed: () => taskForm(context),
-        icon: Icon(Icons.create_new_folder_rounded),
-        autofocus: true,
-        color: Theme.of(context).colorScheme.primary,
-      ),
+      header: NavBar(title: "Welcome"),
+      menu: SideBar(name: user!.name, email: user!.email),
+      content: Schedule(),
+      //  Obx(() {
+      //   return PaginatedTableView<Task>(
+      //     title: 'Task Management',
+      //     items: ctrl.tasks,
+      //     isLoading: ctrl.isLoading.value,
+      //     hasError: ctrl.errorMessage.value,
+      //     isSelected: (value) => value.done,
+      //     columns: [
+      //       DataColumn(label: Text('Id')),
+      //       DataColumn(label: Text('Title')),
+      //       DataColumn(label: Text('Done')),
+      //     ],
+      //     sorters: [
+      //       // pull out the fields directly from your model
+      //       (t) => t.id ?? 0,
+      //       (t) => t.title.toLowerCase(),
+      //       (t) => t.done ? 1 : 0,
+      //     ],
+      //     rowBuilder: (item, idx) => [
+      //       DataCell(Text('${idx + 1}')),
+      //       DataCell(Text(item.title)),
+      //       DataCell(
+      //         Checkbox(
+      //           value: item.done,
+      //           onChanged: (v) async =>
+      //               await ctrl.change(item.copyWith(done: v!)),
+      //         ),
+      //       ),
+      //     ],
+      //     onEdit: (v) => taskForm(context, task: v),
+      //     onDelete: (v) => confirmDelete<Task>(
+      //       title: v.title,
+      //       onConfirm: () async => await ctrl.remove(v.id!),
+      //     ),
+      //   );
+      // }),
+      // button: IconButton(
+      //   onPressed: () => taskForm(context),
+      //   icon: Icon(Icons.create_new_folder_rounded),
+      //   autofocus: true,
+      //   color: Theme.of(context).colorScheme.primary,
+      // ),
     );
   }
 }

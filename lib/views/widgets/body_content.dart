@@ -17,7 +17,10 @@ class BodyContent extends StatelessWidget {
     return Scaffold(
       appBar: header,
       drawer: menu == null ? null : SafeArea(child: menu!),
-      body: SafeArea(child: content ?? SizedBox.shrink()),
+      body: Container(
+        margin: EdgeInsets.only(top: 8),
+        child: SafeArea(child: content ?? SizedBox.shrink()),
+      ),
       floatingActionButton: button,
     );
   }

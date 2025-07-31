@@ -5,14 +5,8 @@ class TaskDbHelper extends GenericDbHelper<Task> {
   @override
   String get tableName => 'tasks';
 
-  @override //'CREATE_TASKS_TABLE';
+  @override
   String get createTableSql => 'CREATE_TASKS_TABLE';
-  //  '''
-  //     CREATE TABLE tasks(
-  //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-  //     title TEXT NOT NULL,
-  //     done INTEGER NOT NULL)
-  //   ''';
 
   @override
   Task get blankModel => Task(title: '', done: false);

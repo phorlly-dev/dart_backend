@@ -1,10 +1,10 @@
 import 'package:dart_backend/controllers/control_provider.dart';
-import 'package:dart_backend/data/task_db_helper.dart';
-import 'package:dart_backend/models/task.dart';
+import 'package:dart_backend/data/event_db_helper.dart';
+import 'package:dart_backend/models/event.dart';
 import 'package:get/get.dart';
 
-class TaskController extends ControlProvider<Task> {
-  final _db = TaskDbHelper();
+class EventController extends ControlProvider<Event> {
+  final _db = EventDbHelper();
 
   @override
   void onInit() {
@@ -27,7 +27,7 @@ class TaskController extends ControlProvider<Task> {
   }
 
   /// FETCH ONE
-  Future<Task?> show(int id) async {
+  Future<Event?> show(int id) async {
     try {
       isLoading.value = true;
       final res = await _db.retrieve(id);
@@ -41,7 +41,7 @@ class TaskController extends ControlProvider<Task> {
   }
 
   /// CREATE
-  Future<void> store(Task req) async {
+  Future<void> store(Event req) async {
     try {
       isLoading.value = true;
       final res = await _db.make(req);
@@ -60,7 +60,7 @@ class TaskController extends ControlProvider<Task> {
   }
 
   /// UPDATE
-  Future<void> change(Task req) async {
+  Future<void> change(Event req) async {
     try {
       isLoading.value = true;
       await _db.release(req);

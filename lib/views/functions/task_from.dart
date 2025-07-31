@@ -35,7 +35,12 @@ Future<void> taskForm(BuildContext context, {Task? task}) {
     store: () async {
       await ctrl.store(Task(title: title.text.trim(), done: done.value));
       if (!context.mounted) return;
-      showToast(context, title: 'Task', message: 'The task saved.');
+      showToast(
+        context,
+        type: Toast.info,
+        title: 'Task',
+        message: 'The task saved.',
+      );
     },
     release: () async {
       await ctrl.change(

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_backend/app.dart';
 import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/data/database_provider.dart';
+import 'package:dart_backend/data/event_db_helper.dart';
 import 'package:dart_backend/data/task_db_helper.dart';
 import 'package:dart_backend/data/user_db_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -34,6 +35,7 @@ Future<void> main() async {
 
   // 3️⃣ register all table DDL
   TaskDbHelper(); // registers tasks table
+  EventDbHelper(); // registers events table
   UserDbHelper(); // registers users table
 
   // 3️⃣ Force DB creation before the UI starts

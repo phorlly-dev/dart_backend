@@ -1,3 +1,4 @@
+import 'package:dart_backend/controllers/control_provider.dart';
 import 'package:dart_backend/data/auth_helper.dart';
 import 'package:dart_backend/data/user_db_helper.dart';
 import 'package:dart_backend/models/login_request.dart';
@@ -6,11 +7,9 @@ import 'package:dart_backend/utils/index.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-class AuthController extends GetxController {
+class AuthController extends ControlProvider<User> {
   final AuthRepository _repo = AuthRepositoryImpl();
   final UserDbHelper _helper = UserDbHelper();
-  final RxBool isLoading = false.obs;
-  final RxString errorMessage = ''.obs;
   final Rxn<User> currentUser = Rxn<User>();
 
   /// REGISTER
@@ -68,10 +67,10 @@ class AuthController extends GetxController {
   }
 
   /// LOGOUT
-  void logout() async {
+  Future<void> logout() async {
     await _repo.logout(currentUser.value!);
-    currentUser.value = null;
     errorMessage.value = 'The session has been cleared.';
+    currentUser.value = null;
   }
 
   ///AUTO LOGIN

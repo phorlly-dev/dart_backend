@@ -4,8 +4,8 @@ import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/views/widgets/animations.dart';
 import 'package:dart_backend/utils/toastification.dart';
-import 'package:dart_backend/views/widgets/login.dart';
-import 'package:dart_backend/views/widgets/register.dart';
+import 'package:dart_backend/views/forms/login.dart';
+import 'package:dart_backend/views/forms/register.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -106,6 +106,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   // show toast in the right Scaffold
                                   showToast(
                                     ctx,
+                                    type: Toast.info,
                                     title: 'Registered',
                                     message: 'Please log in.',
                                   );

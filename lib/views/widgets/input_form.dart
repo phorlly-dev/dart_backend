@@ -12,7 +12,7 @@ class InputForm extends StatelessWidget {
   final TextInputType? inputType;
   final VoidCallback? visibleText;
   final double? width;
-  final void Function(String value)? onChanged;
+  final ValueChanged<String>? onChanged;
 
   const InputForm({
     super.key,

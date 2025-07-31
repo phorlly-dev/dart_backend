@@ -27,15 +27,15 @@ class Task implements DbModel {
   /// sqflite uses 0/1 for booleans
   @override
   Task fromMap(Map<String, dynamic> map) => Task(
-    id: map['id'] as int?,
-    title: map['title'] as String,
-    done: (map['done'] as int) == 1,
-  );
+        id: map['id'] as int?,
+        title: map['title'] as String,
+        done: (map['done'] as int) == 1,
+      );
 
   @override
   Map<String, dynamic> toMap() => {
-    if (id != null) 'id': id,
-    'title': title,
-    'done': done ? 1 : 0,
-  };
+        if (id != null) 'id': id,
+        'title': title,
+        'done': done ? 1 : 0,
+      };
 }

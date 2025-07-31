@@ -25,6 +25,7 @@ class MainApp extends StatelessWidget {
       theme: ThemeData.light(), // Default light theme
       darkTheme: ThemeData.dark(), // Dark theme
       themeMode: ThemeMode.system, // Follow system or allow toggling
+
       //initial screen
       navigatorKey: Get.key,
       home: SplashScreen(),
