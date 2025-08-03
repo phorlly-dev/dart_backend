@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class BodyContent extends StatelessWidget {
+class AppEntire extends StatelessWidget {
   final Widget? menu, content, button;
   final PreferredSizeWidget? header;
 
-  const BodyContent({
+  const AppEntire({
     super.key,
     this.menu,
     this.content,

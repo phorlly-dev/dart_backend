@@ -8,13 +8,13 @@ import 'package:get/get.dart';
 class AppShellScreen extends StatelessWidget {
   const AppShellScreen({super.key});
 
-  Future<Params?> _loadParams() async {
+  Future<UserParams?> _loadParams() async {
     final auth = Get.find<AuthController>();
 
     // 1️⃣ If we already have someone in memory, go straight to them:
     final inMemory = auth.currentUser.value;
     if (inMemory != null) {
-      return Params(info: inMemory);
+      return UserParams(info: inMemory);
     }
 
     // 2️⃣ Otherwise try the persistent remember-me logic:
@@ -22,17 +22,17 @@ class AppShellScreen extends StatelessWidget {
     if (me == null) return null;
 
     final args = Get.arguments;
-    if (args is Params) {
+    if (args is UserParams) {
       return args;
     } else if (args is Map) {
-      return Params(info: args['info']);
+      return UserParams(info: args['info']);
     }
-    return Params(info: me);
+    return UserParams(info: me);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Params?>(
+    return FutureBuilder<UserParams?>(
       future: _loadParams(),
       builder: (ctx, snap) {
         // still loading…

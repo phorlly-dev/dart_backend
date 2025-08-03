@@ -1,9 +1,14 @@
+import 'package:dart_backend/controllers/auth_controller.dart';
+import 'package:dart_backend/controllers/event_controller.dart';
 import 'package:dart_backend/controllers/task_controller.dart';
 import 'package:dart_backend/controllers/user_controller.dart';
 import 'package:dart_backend/views/screens/app_shell.dart';
 import 'package:dart_backend/views/screens/auth.dart';
+import 'package:dart_backend/views/screens/create_edit_event.dart';
+import 'package:dart_backend/views/screens/event_detail.dart';
 import 'package:dart_backend/views/screens/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class MainApp extends StatelessWidget {
@@ -12,8 +17,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Register controllers / bindings here
+    Get.put(AuthController());
     Get.put(TaskController());
     Get.put(UserController());
+    Get.put(EventController());
 
     return GetMaterialApp(
       title: 'Dart Back-End',
@@ -21,6 +28,11 @@ class MainApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/app-shell', page: () => const AppShellScreen()),
         GetPage(name: '/auth', page: () => const AuthScreen()),
+        GetPage(name: '/event/detail', page: () => const EventDetailScreen()),
+        GetPage(
+          name: '/event/create-or-edit',
+          page: () => const CreateEditEventScreen(),
+        ),
       ],
       theme: ThemeData.light(), // Default light theme
       darkTheme: ThemeData.dark(), // Dark theme
@@ -28,7 +40,11 @@ class MainApp extends StatelessWidget {
 
       //initial screen
       navigatorKey: Get.key,
-      home: SplashScreen(),
+      home: ScreenUtilInit(
+        designSize: Size(375, 812),
+        minTextAdapt: true,
+        builder: (_, __) => const SplashScreen(),
+      ),
     );
   }
 }

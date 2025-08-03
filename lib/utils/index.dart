@@ -1,6 +1,10 @@
 import 'package:bcrypt/bcrypt.dart';
+import 'package:dart_backend/controllers/event_controller.dart';
+import 'package:dart_backend/models/event.dart';
 import 'package:dart_backend/models/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 /// List of Background Images////
 final bgList = [
@@ -14,10 +18,40 @@ final bgList = [
   "assets/images/bg8.jpeg",
 ];
 
-class Params {
+enum Status { pending, loading, completed, failed, cancel }
+
+class StatusItem {
+  final int id;
+  final String name;
+  final Status status;
+
+  const StatusItem({
+    required this.id,
+    required this.name,
+    required this.status,
+  });
+}
+
+final statusList = [
+  StatusItem(id: 0, name: 'Pending...', status: Status.pending),
+  StatusItem(id: 1, name: 'Loading...', status: Status.loading),
+  StatusItem(id: 2, name: 'Completed', status: Status.completed),
+  StatusItem(id: 3, name: 'Failed', status: Status.failed),
+  StatusItem(id: 4, name: 'Cancel', status: Status.cancel),
+];
+
+class UserParams {
   final User? info;
 
-  Params({this.info});
+  UserParams({this.info});
+}
+
+class EventParams {
+  final int? id;
+  final Event? state;
+  final EventController? payload;
+
+  EventParams({this.id, this.state, this.payload});
 }
 
 String hashPwd(String password) {
@@ -27,9 +61,7 @@ String hashPwd(String password) {
   return hashed;
 }
 
-bool checkPwd(String req, String current) {
-  return BCrypt.checkpw(req, current);
-}
+bool checkPwd(String req, String current) => BCrypt.checkpw(req, current);
 
 String? setEnv(String name) {
   final env = dotenv.env[name];
@@ -58,6 +90,52 @@ String getInitials(String name) {
   }
 
   return initials.toUpperCase();
+}
+
+String timeStr(String name, {String? format}) =>
+    dateStr(strDate(name), format: format ?? 'h:mm a');
+
+String dateStr(DateTime date, {String? format}) =>
+    DateFormat(format ?? 'd MMMM yyyy').format(date);
+
+DateTime strDate(String name) => DateTime.parse(name);
+
+DateTime dateNow() => DateTime.now();
+
+bool dateCheck(String provided, DateTime selected) {
+  final str = strDate(provided);
+  final providedDate = DateFormat.yMd().format(str);
+  final selectedDate = DateFormat.yMd().format(selected);
+
+  if (providedDate == selectedDate) {
+    return true;
+  }
+
+  return false;
+}
+
+int timeSplit(String time, int index) =>
+    int.parse(time.toString().split(':')[index]);
+
+/// Tries to load an argument of type [T] from Get.arguments.
+///
+/// - If `arguments` *is* a T, returns it directly.
+/// - If `arguments` is a Map and contains [mapKey], returns
+///   `fromJson(arguments[mapKey])`.
+/// - Otherwise returns null.
+T? loadParams<T>(
+  String mapKey, {
+  required T Function(dynamic json) fromJson,
+}) {
+  final args = Get.arguments;
+  if (args is T) {
+    return args;
+  }
+  if (args is Map<String, dynamic> && args.containsKey(mapKey)) {
+    return fromJson(args[mapKey]);
+  }
+
+  return null;
 }
 
 

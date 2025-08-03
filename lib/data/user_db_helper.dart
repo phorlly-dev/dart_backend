@@ -5,8 +5,15 @@ class UserDbHelper extends GenericDbHelper<User> {
   @override
   String get tableName => 'users';
 
-  @override
-  String get createTableSql => 'CREATE_USERS_TABLE';
+  @override //'CREATE_USERS_TABLE'
+  String get createTableSql => '''CREATE TABLE users(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          email TEXT NOT NULL UNIQUE,
+          password TEXT NOT NULL,
+          remember INTEGER NOT NULL,
+          role INTEGER NOT NULL,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)''';
 
   @override
   User get blankModel =>

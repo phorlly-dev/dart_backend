@@ -28,7 +28,7 @@ void showToast(
       );
       break;
     case Toast.info:
-      toastification.show(
+      toastification.showInfo(
         context: ctx,
         title: title,
         description: message,

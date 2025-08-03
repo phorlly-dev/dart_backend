@@ -4,8 +4,8 @@ import 'package:dart_backend/controllers/auth_controller.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/views/widgets/animations.dart';
 import 'package:dart_backend/utils/toastification.dart';
-import 'package:dart_backend/views/forms/login.dart';
-import 'package:dart_backend/views/forms/register.dart';
+import 'package:dart_backend/views/forms/login_form.dart';
+import 'package:dart_backend/views/forms/register_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,10 +1,11 @@
+import 'package:dart_backend/views/widgets/action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SubmitForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final List<Widget> children;
-  final VoidCallback? onPressed;
+  final VoidCallback onPressed;
   final String? labelBtn;
   final Color? colorBtn;
   final IconData? iconBtn;
@@ -13,7 +14,7 @@ class SubmitForm extends StatelessWidget {
     super.key,
     required this.formKey,
     required this.children,
-    this.onPressed,
+    required this.onPressed,
     this.labelBtn,
     this.colorBtn,
     this.iconBtn,
@@ -36,31 +37,17 @@ class SubmitForm extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  TextButton.icon(
-                    label: const Text('Back'),
+                  ActionButton(
+                    labelBtn: 'Back',
+                    iconBtn: Icons.arrow_back_ios_rounded,
+                    colorBtn: colors.scrim,
                     onPressed: () => Get.back(),
-                    icon: Icon(Icons.arrow_back_ios_rounded),
-                    autofocus: true,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.secondary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                   ),
-                  TextButton.icon(
-                    label: Text(labelBtn ?? 'Save'),
+                  ActionButton(
+                    labelBtn: labelBtn ?? 'Save',
+                    iconBtn: iconBtn ?? Icons.save,
+                    colorBtn: colorBtn ?? colors.primary,
                     onPressed: onPressed,
-                    icon: Icon(iconBtn ?? Icons.save),
-                    autofocus: true,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorBtn ?? colors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                   ),
                 ],
               ),

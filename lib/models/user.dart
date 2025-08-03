@@ -12,15 +12,18 @@ class User implements DbModel {
   final String password;
   final bool remember;
   final bool role;
+  @JsonKey(name: 'created_at')
+  final String createdAt; // full timestamp
 
   User({
     this.id,
     required this.name,
     required this.email,
     required this.password,
+    String? createdAt,
     this.role = false,
     this.remember = false,
-  });
+  }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
 
   User copyWith({
     int? id,
@@ -28,6 +31,7 @@ class User implements DbModel {
     String? email,
     String? password,
     bool? role,
+    String? createdAt,
     bool? remember,
   }) {
     return User(
@@ -37,6 +41,7 @@ class User implements DbModel {
       password: password ?? this.password,
       role: role ?? this.role,
       remember: remember ?? this.remember,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -47,21 +52,22 @@ class User implements DbModel {
   // DbModel
   @override
   User fromMap(Map<String, dynamic> map) => User(
-    id: map['id'] as int?,
-    name: map['name'] as String,
-    email: map['email'] as String,
-    password: map['password'] as String,
-    role: (map['role'] as int) == 1,
-    remember: (map['remember'] as int) == 1,
-  );
+        id: map['id'] as int?,
+        name: map['name'] as String,
+        email: map['email'] as String,
+        password: map['password'] as String,
+        role: (map['role'] as int) == 1,
+        createdAt: map['created_at'] as String,
+        remember: (map['remember'] as int) == 1,
+      );
 
   @override
   Map<String, dynamic> toMap() => {
-    if (id != null) 'id': id,
-    'name': name,
-    'email': email,
-    'password': password,
-    'role': role ? 1 : 0,
-    'remember': remember ? 1 : 0,
-  };
+        if (id != null) 'id': id,
+        'name': name,
+        'email': email,
+        'password': password,
+        'role': role ? 1 : 0,
+        'remember': remember ? 1 : 0,
+      };
 }

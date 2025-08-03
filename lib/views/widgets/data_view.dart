@@ -23,18 +23,13 @@ class DataView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // If loading, show a loading animation
-    if (isLoading == true) {
+    if (isLoading == true && hasError!.isNotEmpty) {
       return Container(
         margin: EdgeInsets.only(top: .3.sh),
-        child: LoadingAnimation(type: LoadingType.cupertino),
-      );
-    }
-
-    // If an error is present, show the error message
-    if (hasError!.isNotEmpty) {
-      return Container(
-        margin: EdgeInsets.only(top: .3.sh),
-        child: LoadingAnimation(label: hasError!),
+        child: LoadingAnimation(
+          type: LoadingType.cupertino,
+          label: hasError!,
+        ),
       );
     }
 
@@ -51,12 +46,12 @@ class DataView<T> extends StatelessWidget {
 
     // If items are found, display them in a ListView
     return ListView.builder(
-      primary: false,
+      // primary: false,
       itemCount: itemCounter,
       itemBuilder: itemBuilder,
-      physics: NeverScrollableScrollPhysics(), // Not scrollable
+      physics: const NeverScrollableScrollPhysics(), // Not scrollable
       shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      // padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     );
   }
 }

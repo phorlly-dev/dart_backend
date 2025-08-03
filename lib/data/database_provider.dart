@@ -15,13 +15,13 @@ class DatabaseProvider {
   static final _dbVersion = setEnv('DB_VERSION');
 
   final List<String> _tableScripts = [];
-  Database? _db;
+  late Database? _db;
 
   /// Called by each helper to register its CREATE TABLE DDL.
   void registerTable(String createTableSql) {
-    final sqlQuery = setEnv(createTableSql);
-    if (!_tableScripts.contains(sqlQuery)) {
-      _tableScripts.add(sqlQuery!);
+    // final sqlQuery = setEnv(createTableSql);
+    if (!_tableScripts.contains(createTableSql)) {
+      _tableScripts.add(createTableSql);
     }
   }
 
@@ -30,7 +30,7 @@ class DatabaseProvider {
     if (_db != null) return _db!;
 
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, _dbName);
+    final path = join(dbPath, _dbName ?? 'app.db');
 
     _db = await openDatabase(
       path,
@@ -40,6 +40,13 @@ class DatabaseProvider {
           await db.execute(script);
         }
       },
+      // onOpen: (db) async {
+      //   if (_tableScripts.isNotEmpty) {
+      //     for (final script in _tableScripts) {
+      //       await db.execute(script);
+      //     }
+      //   }
+      // },
     );
 
     return _db!;

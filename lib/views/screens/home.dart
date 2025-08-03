@@ -1,7 +1,7 @@
 import 'package:dart_backend/models/user.dart';
-import 'package:dart_backend/views/widgets/body_content.dart';
+import 'package:dart_backend/views/widgets/app_entire.dart';
 import 'package:dart_backend/views/widgets/nav_bar.dart';
-import 'package:dart_backend/views/widgets/schedule.dart';
+import 'package:dart_backend/views/partials/schedule.dart';
 import 'package:dart_backend/views/widgets/side_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -14,9 +14,13 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // final TaskController ctrl = Get.find();
 
-    return BodyContent(
+    return AppEntire(
       header: NavBar(title: "Welcome"),
-      menu: SideBar(name: user!.name, email: user!.email),
+      menu: SideBar(
+        name: user?.name,
+        email: user?.email,
+        createdAt: user?.createdAt,
+      ),
       content: Schedule(),
       //  Obx(() {
       //   return PaginatedTableView<Task>(

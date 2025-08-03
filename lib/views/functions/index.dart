@@ -1,7 +1,10 @@
+import 'package:dart_backend/utils/toastification.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-Future<T?> confirmDelete<T>({
+Future<T?> confirmDelete<T>(
+  BuildContext ctx, {
   required String title,
   required VoidCallback onConfirm,
 }) {
@@ -11,14 +14,36 @@ Future<T?> confirmDelete<T>({
     onConfirm: () {
       onConfirm.call();
       Get.back();
-      Get.snackbar(
-        "Removed",
-        '"$title" from Database!',
-        snackPosition: SnackPosition.BOTTOM,
-        icon: Icon(Icons.check),
+      showToast(
+        ctx,
+        title: 'Removed Existing!',
+        message: '"$title" from Database.',
       );
     },
-    onCancel: Get.back,
+    onCancel: () => Get.back,
+    barrierDismissible: false,
+  );
+}
+
+Future<T?> showSottomShee<T>({
+  List<Widget> children = const [],
+  double height = .24,
+}) {
+  return Get.bottomSheet<T>(
+    Container(
+      padding: EdgeInsets.only(top: 8),
+      height: height.sh,
+      width: double.infinity,
+      color: Get.isDarkMode ? Colors.grey[200] : Colors.white,
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: 12,
+          children: children,
+        ),
+      ),
+    ),
+    elevation: 4,
+    isScrollControlled: true,
   );
 }
 

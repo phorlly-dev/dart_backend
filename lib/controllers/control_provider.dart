@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-abstract class ControlProvider<T> extends GetxController {
+class ControlProvider<T> extends GetxController {
   /// Loading & error state
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;

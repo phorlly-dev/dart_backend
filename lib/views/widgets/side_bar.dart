@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SideBar extends StatelessWidget {
-  final String name, email;
+  final String? name, email, createdAt;
 
-  const SideBar({super.key, required this.name, required this.email});
+  const SideBar({super.key, this.name, this.email, this.createdAt});
 
   @override
   Widget build(BuildContext context) {
@@ -26,17 +26,29 @@ class SideBar extends StatelessWidget {
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.blueGrey,
               child: Text(
-                getInitials(name),
+                getInitials(name ?? 'Mrr. Dev'),
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            accountName: Text('My name: $name'),
-            accountEmail: Text(
-              'My email: $email',
-              style: TextStyle(fontSize: 13, color: Colors.white70),
+            accountName: Text('My name: ${name ?? 'Dev'}'),
+            accountEmail: Wrap(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'My email: ${email ?? 'dev@g.me'}',
+                      style: TextStyle(fontSize: 13, color: Colors.white70),
+                    ),
+                    Text(
+                      'Created at: ${dateStr(strDate(createdAt!))}',
+                      style: TextStyle(fontSize: 12, color: Colors.white54),
+                    )
+                  ],
+                ),
+              ],
             ),
           ),
-
           MenuItem(
             label: "Log out".toUpperCase(),
             goTo: () async {

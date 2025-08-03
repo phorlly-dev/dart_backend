@@ -43,7 +43,7 @@ abstract class GenericDbHelper<T extends DbModel> {
   Future<List<T>> list({String orderBy = 'id DESC'}) async {
     final db = await database;
     final rows = await db.query(tableName, orderBy: orderBy);
-    return rows.map((r) => blankModel.fromMap(r) as T).toList();
+    return rows.map((res) => blankModel.fromMap(res) as T).toList();
   }
 
   /// READ ONE → by primary key

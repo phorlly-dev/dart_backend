@@ -77,37 +77,37 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   Widget _emailField() => InputForm(
-    controller: _email,
-    label: 'Email',
-    icon: Icons.mail,
-    inputType: TextInputType.emailAddress,
-    validator: (v) =>
-        (v?.contains('@') ?? false) ? null : 'Enter a valid email',
-  );
+        controller: _email,
+        label: 'Email',
+        icon: Icons.mail,
+        inputType: TextInputType.emailAddress,
+        validator: (v) =>
+            (v?.contains('@') ?? false) ? null : 'Enter a valid email',
+      );
 
   Widget _nameField() => InputForm(
-    controller: _name,
-    label: 'Full Name',
-    icon: Icons.person,
-    autofocus: true,
-    validator: (v) => (v?.isNotEmpty ?? false) ? null : 'Required',
-  );
+        controller: _name,
+        label: 'Full Name',
+        icon: Icons.person,
+        autofocus: true,
+        validator: (v) => (v?.isNotEmpty ?? false) ? null : 'Required',
+      );
 
   Widget _passwordField() => InputForm(
-    controller: _password,
-    label: 'Password',
-    icon: Icons.lock,
-    validator: (v) => (v?.length ?? 0) >= 6 ? null : 'Min 6 characters',
-    obscureText: _visPass,
-    visibleText: () => setState(() => _visPass = !_visPass),
-  );
+        controller: _password,
+        label: 'Password',
+        icon: Icons.lock,
+        validator: (v) => (v?.length ?? 0) >= 6 ? null : 'Min 6 characters',
+        obscureText: _visPass,
+        visibleText: () => setState(() => _visPass = !_visPass),
+      );
 
   Widget _confirmPasswordField() => InputForm(
-    controller: _confirm,
-    label: 'Confirm Password',
-    icon: Icons.lock_outline,
-    validator: (v) => v == _password.text ? null : 'Passwords do not match',
-    obscureText: _visConPass,
-    visibleText: () => setState(() => _visConPass = !_visConPass),
-  );
+        controller: _confirm,
+        label: 'Confirm Password',
+        icon: Icons.lock_outline,
+        validator: (v) => v == _password.text ? null : 'Passwords do not match',
+        obscureText: _visConPass,
+        visibleText: () => setState(() => _visConPass = !_visConPass),
+      );
 }

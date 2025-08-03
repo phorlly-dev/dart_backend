@@ -67,7 +67,7 @@ class _LoginFormState extends State<LoginForm> {
       );
       _password.clear();
     } else {
-      Get.offAllNamed('/app-shell', arguments: Params(info: me));
+      Get.offAllNamed('/app-shell', arguments: UserParams(info: me));
       showToast(
         context,
         title: 'Welcome!',
@@ -114,21 +114,22 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Widget _emailField() => InputForm(
-    controller: _email,
-    label: 'Email',
-    icon: Icons.mail,
-    inputType: TextInputType.emailAddress,
-    autofocus: true,
-    validator: (v) =>
-        (v != null && v.contains('@')) ? null : 'Enter a valid email',
-  );
+        controller: _email,
+        label: 'Email',
+        icon: Icons.mail,
+        inputType: TextInputType.emailAddress,
+        autofocus: true,
+        validator: (v) =>
+            (v != null && v.contains('@')) ? null : 'Enter a valid email',
+      );
 
   Widget _passwordField() => InputForm(
-    controller: _password,
-    label: 'Password',
-    icon: Icons.lock,
-    validator: (v) => (v != null && v.length >= 6) ? null : 'Min 6 characters',
-    obscureText: _passwordVisible,
-    visibleText: () => setState(() => _passwordVisible = !_passwordVisible),
-  );
+        controller: _password,
+        label: 'Password',
+        icon: Icons.lock,
+        validator: (v) =>
+            (v != null && v.length >= 6) ? null : 'Min 6 characters',
+        obscureText: _passwordVisible,
+        visibleText: () => setState(() => _passwordVisible = !_passwordVisible),
+      );
 }
