@@ -1,9 +1,13 @@
 import 'dart:io';
+
+import 'package:dart_backend/controllers/auth_controller.dart';
+import 'package:dart_backend/controllers/event_controller.dart';
+import 'package:dart_backend/controllers/task_controller.dart';
+import 'package:dart_backend/controllers/user_controller.dart';
 import 'package:dart_backend/data/database_provider.dart';
 import 'package:dart_backend/data/event_db_helper.dart';
 import 'package:dart_backend/data/task_db_helper.dart';
 import 'package:dart_backend/data/user_db_helper.dart';
-import 'package:dart_backend/utils/notification_service.dart';
 import 'package:dart_backend/views/widgets/loading_animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -32,36 +36,39 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _initApp() async {
     try {
-      // 1️⃣ Load environment
+      // 1️⃣ Load environment variables
       await dotenv.load(fileName: ".env");
 
+      // 2️⃣ Initialize sqflite factories *before* opening any DB
       if (kIsWeb) {
-        // Web uses the IndexedDB shim
         databaseFactory = databaseFactoryFfiWeb;
       } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        // Desktop uses ffi
         sqfliteFfiInit();
         databaseFactory = databaseFactoryFfi;
-      } else {
-        // Mobile (Android/iOS) — don't touch databaseFactory!
-        // sqflite's default platform‐channel factory will be used.
       }
+      // on mobile do nothing (sqflite auto‐registers)
 
-      // 2️⃣ Initialize your database (register tables + open)
+      // 3️⃣ Register your tables now that env is loaded
       TaskDbHelper();
       EventDbHelper();
       UserDbHelper();
+
+      // 4️⃣ Open the database (this will read DB_NAME and DB_VERSION from dotenv.env)
       await DatabaseProvider.instance.database;
 
-      // 3️⃣ Register controllers, ScreenUtil, notifications, etc.
+      // 5️⃣ Other inits (ScreenUtil, controllers…)
       await ScreenUtil.ensureScreenSize();
-      await initNotify();
+      Get.put(AuthController());
+      Get.put(TaskController());
+      Get.put(UserController());
+      Get.put(EventController());
 
-      // 4️⃣ Done – navigate into your real app shell
+      // 6️⃣ All done, navigate to your app shell
       Get.offAllNamed('/app-shell');
     } catch (e) {
       // If anything fails, show an error + retry button
       setState(() => _error = e.toString());
+      debugPrint('Error: ${e.toString()}');
     }
   }
 

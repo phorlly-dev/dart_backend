@@ -59,7 +59,7 @@ class _RegisterFormState extends State<RegisterForm> {
           name: name,
           email: email,
           password: password,
-          role: false,
+          role: true,
         );
 
         // And hand it off to the parent

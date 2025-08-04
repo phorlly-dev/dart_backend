@@ -1,10 +1,12 @@
-import 'package:dart_backend/controllers/control_provider.dart';
 import 'package:dart_backend/data/task_db_helper.dart';
 import 'package:dart_backend/models/task.dart';
 import 'package:get/get.dart';
 
-class TaskController extends ControlProvider<Task> {
+class TaskController extends GetxController {
   final _db = TaskDbHelper();
+  final RxList<Task> states = <Task>[].obs;
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -17,7 +19,7 @@ class TaskController extends ControlProvider<Task> {
     try {
       isLoading.value = true;
       final all = await _db.list();
-      items.assignAll(all);
+      states.assignAll(all);
       errorMessage.value = '';
     } catch (e) {
       errorMessage.value = 'Could not load records: $e';
@@ -45,13 +47,13 @@ class TaskController extends ControlProvider<Task> {
     try {
       isLoading.value = true;
       final res = await _db.make(req);
-      items.add(res);
+      states.add(res);
       errorMessage.value = '';
       // for DESC order (newest at top):
-      items.sort((a, b) => b.id!.compareTo(a.id!));
+      states.sort((a, b) => b.id!.compareTo(a.id!));
 
       // OR, for ASC order (newest at bottom):
-      // items.sort((a, b) => a.id!.compareTo(b.id!));
+      // states.sort((a, b) => a.id!.compareTo(b.id!));
     } catch (e) {
       errorMessage.value = 'Could not create record: $e';
     } finally {
@@ -64,8 +66,8 @@ class TaskController extends ControlProvider<Task> {
     try {
       isLoading.value = true;
       await _db.release(req);
-      final idx = items.indexWhere((res) => res.id == req.id);
-      if (idx != -1) items[idx] = req;
+      final idx = states.indexWhere((res) => res.id == req.id);
+      if (idx != -1) states[idx] = req;
       errorMessage.value = '';
     } catch (e) {
       errorMessage.value = 'Could not update record: $e';
@@ -79,7 +81,7 @@ class TaskController extends ControlProvider<Task> {
     try {
       isLoading.value = true;
       await _db.destoy(id);
-      items.removeWhere((res) => res.id == id);
+      states.removeWhere((res) => res.id == id);
       errorMessage.value = '';
     } catch (e) {
       errorMessage.value = 'Could not delete record: $e';

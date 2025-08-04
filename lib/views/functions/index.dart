@@ -25,19 +25,19 @@ Future<T?> confirmDelete<T>(
   );
 }
 
-Future<T?> showSottomShee<T>({
+Future<void> showSottomShee({
   List<Widget> children = const [],
   double height = .24,
 }) {
-  return Get.bottomSheet<T>(
+  return Get.bottomSheet(
     Container(
-      padding: EdgeInsets.only(top: 8),
+      padding: EdgeInsets.symmetric(vertical: 8),
       height: height.sh,
       width: double.infinity,
       color: Get.isDarkMode ? Colors.grey[200] : Colors.white,
       child: SingleChildScrollView(
         child: Column(
-          spacing: 12,
+          spacing: 8,
           children: children,
         ),
       ),

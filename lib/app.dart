@@ -1,7 +1,3 @@
-import 'package:dart_backend/controllers/auth_controller.dart';
-import 'package:dart_backend/controllers/event_controller.dart';
-import 'package:dart_backend/controllers/task_controller.dart';
-import 'package:dart_backend/controllers/user_controller.dart';
 import 'package:dart_backend/views/screens/app_shell.dart';
 import 'package:dart_backend/views/screens/auth.dart';
 import 'package:dart_backend/views/screens/create_edit_event.dart';
@@ -16,12 +12,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Register controllers / bindings here
-    Get.put(AuthController());
-    Get.put(TaskController());
-    Get.put(UserController());
-    Get.put(EventController());
-
     return GetMaterialApp(
       title: 'Dart Back-End',
       debugShowCheckedModeBanner: false,

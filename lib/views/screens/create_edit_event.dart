@@ -8,9 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreateEditEventScreen extends StatelessWidget {
-  const CreateEditEventScreen({
-    super.key,
-  });
+  const CreateEditEventScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +21,7 @@ class CreateEditEventScreen extends StatelessWidget {
 
     return AppEntire(
       header: NavBar(title: model != null ? 'Edit Event' : "Add Event"),
-      content: EventForm(
-        controller: controller!,
-        model: model,
-      ),
+      content: EventForm(controller: controller!, model: model),
     );
   }
 }

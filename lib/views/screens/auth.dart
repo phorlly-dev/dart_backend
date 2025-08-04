@@ -80,7 +80,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       children: [
                         LoginForm(controller: _controller),
                         Builder(
-                          builder: (ctx) {
+                          builder: (context) {
                             return RegisterForm(
                               onSubmit: (req) async {
                                 // 1️⃣ perform registration
@@ -88,10 +88,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
                                 // 2️⃣ read updated state
                                 final err = _controller.errorMessage.value;
+                                final me = _controller.currentUser.value;
 
-                                if (!ctx.mounted) return;
+                                if (!context.mounted) return;
 
-                                if (err.isNotEmpty) {
+                                if (err.isNotEmpty && me == null) {
                                   // error
                                   showToast(
                                     context,
@@ -99,13 +100,14 @@ class _AuthScreenState extends State<AuthScreen> {
                                     title: 'Registration unsuccessful!',
                                     message: err,
                                   );
+                                  debugPrint(err);
                                 } else {
                                   // switch back to Login tab
-                                  DefaultTabController.of(ctx).animateTo(0);
+                                  DefaultTabController.of(context).animateTo(0);
 
                                   // show toast in the right Scaffold
                                   showToast(
-                                    ctx,
+                                    context,
                                     type: Toast.info,
                                     title: 'Registered',
                                     message: 'Please log in.',

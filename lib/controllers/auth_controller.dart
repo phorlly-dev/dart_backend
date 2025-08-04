@@ -1,16 +1,16 @@
-import 'package:dart_backend/controllers/control_provider.dart';
 import 'package:dart_backend/data/auth_helper.dart';
 import 'package:dart_backend/data/user_db_helper.dart';
 import 'package:dart_backend/models/login_request.dart';
 import 'package:dart_backend/models/user.dart';
 import 'package:dart_backend/utils/index.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-class AuthController extends ControlProvider<User> {
+class AuthController extends GetxController {
   final AuthRepository _repo = AuthRepositoryImpl();
   final UserDbHelper _helper = UserDbHelper();
   final Rxn<User> currentUser = Rxn<User>();
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
 
   /// REGISTER
   Future<void> register(User req) async {
@@ -20,11 +20,10 @@ class AuthController extends ControlProvider<User> {
       final hashed = hashPwd(req.password);
       final safed = req.copyWith(password: hashed);
 
-      await _repo.register(safed);
-      // currentUser.value = created;
+      final created = await _repo.register(safed);
+      currentUser.value = created;
     } catch (e) {
-      errorMessage.value = 'Register failed: $e';
-      debugPrint('Register failed: ${e.toString()}');
+      errorMessage.value = 'Register failed: ${e.toString()}';
     } finally {
       isLoading.value = false;
     }
@@ -60,7 +59,6 @@ class AuthController extends ControlProvider<User> {
       }
     } catch (e) {
       errorMessage.value = 'Login failed: $e';
-      debugPrint('Login failed: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

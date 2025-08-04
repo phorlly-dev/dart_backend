@@ -32,8 +32,7 @@ class _EventFormState extends State<EventForm> {
   late Color _color;
   late DateTime _date, _start, _end;
   late EventStatus _status;
-  late String _repeat;
-  final repeatOptions = ['None', 'Daily', 'Weekly', 'Monthly'];
+  late RepeatRule _repeat;
 
   @override
   void initState() {
@@ -44,7 +43,7 @@ class _EventFormState extends State<EventForm> {
     _name = TextEditingController(text: _model?.title ?? '');
     _note = TextEditingController(text: _model?.note ?? '');
     _remind = _model?.remindMin ?? 5;
-    _repeat = _model?.repeatRule ?? 'None';
+    _repeat = _model?.repeatRule ?? RepeatRule.none;
     _status = _model?.status ?? EventStatus.pending;
     _color = _model?.color ?? Colors.green;
     _date = _model?.eventDate == null ? dateNow() : strDate(_model!.eventDate);
@@ -69,22 +68,21 @@ class _EventFormState extends State<EventForm> {
         final end = _end.toIso8601String();
         final err = _controller.errorMessage.value;
 
-        final req = Event(
-          title: name,
-          note: note,
-          eventDate: date,
-          startTime: start,
-          endTime: end,
-          color: _color,
-          remindMin: _remind,
-          repeatRule: _repeat,
-          status: _status,
-        );
-
-        debugPrint("The Record: ${req.toJson()}");
-
         if (_model == null) {
-          await _controller.store(req);
+          await _controller.store(
+            Event(
+              title: name,
+              note: note,
+              eventDate: date,
+              startTime: start,
+              endTime: end,
+              color: _color,
+              remindMin: _remind,
+              repeatRule: _repeat,
+              status: _status,
+            ),
+          );
+
           if (!context.mounted) return;
 
           if (err.isNotEmpty) {
@@ -138,6 +136,7 @@ class _EventFormState extends State<EventForm> {
               title: 'Modified Existing',
               message: 'Updated successfully.',
             );
+
             _formKey.currentState!.reset();
             Get.back();
           }
@@ -168,7 +167,6 @@ class _EventFormState extends State<EventForm> {
           onColorChanged: (value) {
             setState(() {
               _color = value;
-              debugPrint('The value: $_color');
             });
           },
         ),
@@ -193,7 +191,6 @@ class _EventFormState extends State<EventForm> {
                 onChange: (dateTime) {
                   setState(() {
                     _date = dateTime;
-                    debugPrint('The Datetime: $dateTime');
                   });
                 },
               ),
@@ -209,7 +206,6 @@ class _EventFormState extends State<EventForm> {
                 onChange: (dateTime) {
                   setState(() {
                     _start = dateTime;
-                    debugPrint('The Datetime: $dateTime');
                   });
                 },
                 timeFormat: 'h:m a',
@@ -227,7 +223,6 @@ class _EventFormState extends State<EventForm> {
                 onChange: (dateTime) {
                   setState(() {
                     _end = dateTime;
-                    debugPrint('The Datetime: $dateTime');
                   });
                 },
                 timeFormat: 'h:m a',
@@ -260,17 +255,16 @@ class _EventFormState extends State<EventForm> {
           }).toList(),
           onChanged: (value) => setState(() {
             _remind = value!;
-            debugPrint('The value: $_remind');
           }),
         ),
-        SelectOption<String>(
+        SelectOption<RepeatRule>(
           label: 'Repeat',
-          hint: _repeat,
-          options: repeatOptions.map((item) {
-            return DropdownMenuItem<String>(
+          hint: _repeat.label,
+          options: RepeatRule.values.map((item) {
+            return DropdownMenuItem<RepeatRule>(
               value: item,
               child: Text(
-                item,
+                item.label,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.normal,
@@ -280,7 +274,6 @@ class _EventFormState extends State<EventForm> {
           }).toList(),
           onChanged: (value) => setState(() {
             _repeat = value!;
-            debugPrint('The value: $_repeat');
           }),
         ),
         SelectOption<EventStatus>(
@@ -300,7 +293,6 @@ class _EventFormState extends State<EventForm> {
           }).toList(),
           onChanged: (value) => setState(() {
             _status = value!;
-            debugPrint('The value: $_status');
           }),
         ),
       ],

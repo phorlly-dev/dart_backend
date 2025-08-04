@@ -57,8 +57,9 @@ class User implements DbModel {
         email: map['email'] as String,
         password: map['password'] as String,
         role: (map['role'] as int) == 1,
+        remember:
+            ((map['remember'] as int?) ?? 0) == 1, // cast as int? then default
         createdAt: map['created_at'] as String,
-        remember: (map['remember'] as int) == 1,
       );
 
   @override

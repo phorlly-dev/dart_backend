@@ -7,7 +7,7 @@ class SelectOption<T> extends StatelessWidget {
   final List<DropdownMenuItem<T>>? options;
   final void Function(T? value)? onChanged, onSaved;
   final String? Function(T? value)? validator;
-  final String hint, label;
+  final String? hint, label;
 
   const SelectOption({
     super.key,
@@ -16,8 +16,8 @@ class SelectOption<T> extends StatelessWidget {
     this.onChanged,
     this.onSaved,
     this.validator,
-    required this.hint,
-    required this.label,
+    this.hint,
+    this.label,
   });
 
   @override
@@ -35,7 +35,7 @@ class SelectOption<T> extends StatelessWidget {
           labelText: label,
         ),
         hint: Text(
-          hint,
+          hint ?? '',
           style: TextStyle(fontSize: 14),
         ),
         items: options,

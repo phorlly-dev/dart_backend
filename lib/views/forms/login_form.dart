@@ -66,6 +66,7 @@ class _LoginFormState extends State<LoginForm> {
         message: err,
       );
       _password.clear();
+      debugPrint(err);
     } else {
       Get.offAllNamed('/app-shell', arguments: UserParams(info: me));
       showToast(

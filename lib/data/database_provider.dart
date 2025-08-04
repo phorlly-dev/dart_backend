@@ -1,6 +1,4 @@
-// lib/data/database_provider.dart
-
-import 'package:dart_backend/utils/index.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,15 +9,14 @@ class DatabaseProvider {
   DatabaseProvider._();
   static final DatabaseProvider instance = DatabaseProvider._();
 
-  static final _dbName = setEnv('DB_NAME');
-  static final _dbVersion = setEnv('DB_VERSION');
+  static final _dbName = 'app.db';
+  static final _dbVersion = 1;
 
   final List<String> _tableScripts = [];
-  late Database? _db;
+  Database? _db;
 
   /// Called by each helper to register its CREATE TABLE DDL.
   void registerTable(String createTableSql) {
-    // final sqlQuery = setEnv(createTableSql);
     if (!_tableScripts.contains(createTableSql)) {
       _tableScripts.add(createTableSql);
     }
@@ -30,15 +27,20 @@ class DatabaseProvider {
     if (_db != null) return _db!;
 
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, _dbName ?? 'app.db');
+    final path = join(dbPath, _dbName);
+    final sql = await rootBundle.loadString('assets/db/migrations.sql');
 
     _db = await openDatabase(
       path,
-      version: int.parse(_dbVersion ?? '1'),
+      version: _dbVersion,
       onCreate: (db, version) async {
-        for (final script in _tableScripts) {
-          await db.execute(script);
+        for (final script in sql.split(';')) {
+          final query = script.trim();
+          if (query.isNotEmpty) await db.execute('$query;');
         }
+        // for (final script in _tableScripts) {
+        //   await db.execute(script);
+        // }
       },
       // onOpen: (db) async {
       //   if (_tableScripts.isNotEmpty) {

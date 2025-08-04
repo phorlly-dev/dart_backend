@@ -10,7 +10,9 @@ Event _$EventFromJson(Map<String, dynamic> json) => Event(
       id: (json['id'] as num?)?.toInt(),
       title: json['title'] as String,
       note: json['note'] as String?,
-      repeatRule: json['repeat_rule'] as String?,
+      repeatRule:
+          $enumDecodeNullable(_$RepeatRuleEnumMap, json['repeat_rule']) ??
+              RepeatRule.none,
       color: json['color'] == null
           ? const Color(0xFF2196F3)
           : Event._colorFromInt((json['color'] as num).toInt()),
@@ -28,7 +30,7 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'note': instance.note,
-      'repeat_rule': instance.repeatRule,
+      'repeat_rule': _$RepeatRuleEnumMap[instance.repeatRule]!,
       'color': Event._colorToInt(instance.color),
       'status': _$EventStatusEnumMap[instance.status]!,
       'remind_min': instance.remindMin,
@@ -38,6 +40,13 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
     };
+
+const _$RepeatRuleEnumMap = {
+  RepeatRule.none: 'none',
+  RepeatRule.daily: 'daily',
+  RepeatRule.weekly: 'weekly',
+  RepeatRule.monthly: 'monthly',
+};
 
 const _$EventStatusEnumMap = {
   EventStatus.pending: 'pending',

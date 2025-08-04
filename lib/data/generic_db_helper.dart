@@ -35,14 +35,15 @@ abstract class GenericDbHelper<T extends DbModel> {
   Future<T> make(T model) async {
     final db = await database;
     final id = await db.insert(tableName, model.toMap());
-    final full = {...model.toMap(), 'id': id};
-    return blankModel.fromMap(full) as T;
+
+    return (model as dynamic).copyWith(id: id) as T;
   }
 
   /// READ ALL → sorted descending by ID by default
   Future<List<T>> list({String orderBy = 'id DESC'}) async {
     final db = await database;
     final rows = await db.query(tableName, orderBy: orderBy);
+
     return rows.map((res) => blankModel.fromMap(res) as T).toList();
   }
 
@@ -51,6 +52,7 @@ abstract class GenericDbHelper<T extends DbModel> {
     final db = await database;
     final rows = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
     if (rows.isEmpty) return null;
+
     return blankModel.fromMap(rows.first) as T;
   }
 
@@ -58,12 +60,14 @@ abstract class GenericDbHelper<T extends DbModel> {
   Future<int> release(T model) async {
     final db = await database;
     final data = model.toMap();
+
     return db.update(tableName, data, where: 'id = ?', whereArgs: [data['id']]);
   }
 
   /// DELETE → by primary key
   Future<int> destoy(int id) async {
     final db = await database;
+
     return db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 }
