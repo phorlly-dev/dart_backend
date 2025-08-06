@@ -1,19 +1,20 @@
-import 'package:dart_backend/data/auth_helper.dart';
-import 'package:dart_backend/data/user_db_helper.dart';
-import 'package:dart_backend/models/login_request.dart';
-import 'package:dart_backend/models/user.dart';
+import 'package:dart_backend/services/auth_request.dart';
+import 'package:dart_backend/services/user_request.dart';
+import 'package:dart_backend/models/login_response.dart';
+import 'package:dart_backend/models/user_response.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:get/get.dart';
+import 'package:sqflite/sqflite.dart';
 
 class AuthController extends GetxController {
-  final AuthRepository _repo = AuthRepositoryImpl();
-  final UserDbHelper _helper = UserDbHelper();
-  final Rxn<User> currentUser = Rxn<User>();
+  final IAuth _repo = AuthRequest();
+  final UserRequest _helper = UserRequest();
+  final Rxn<UserResponse> currentUser = Rxn<UserResponse>();
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
   /// REGISTER
-  Future<void> register(User req) async {
+  Future<void> register(UserResponse req) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
@@ -22,15 +23,20 @@ class AuthController extends GetxController {
 
       final created = await _repo.register(safed);
       currentUser.value = created;
-    } catch (e) {
-      errorMessage.value = 'Register failed: ${e.toString()}';
+    } on DatabaseException catch (e) {
+      // SQLite returns code 19 for constraint violations
+      if (e.isUniqueConstraintError()) {
+        errorMessage.value = 'That email is already registered';
+      } else {
+        errorMessage.value = 'Registration failed: $e';
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
   /// LOGIN
-  Future<void> login(LoginRequest req, bool rememberMe) async {
+  Future<void> login(LoginResponse req, bool rememberMe) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
@@ -57,7 +63,7 @@ class AuthController extends GetxController {
         await _helper.release(updated);
         currentUser.value = updated;
       }
-    } catch (e) {
+    } on Exception catch (e) {
       errorMessage.value = 'Login failed: $e';
     } finally {
       isLoading.value = false;
@@ -72,7 +78,7 @@ class AuthController extends GetxController {
   }
 
   ///AUTO LOGIN
-  Future<User?> tryAutoLogin() async {
+  Future<UserResponse?> tryAutoLogin() async {
     final res = await _helper.getRememberedUser();
     if (res != null) {
       currentUser.value = res;

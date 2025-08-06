@@ -7,7 +7,8 @@ import 'package:get/get.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-final _notifier = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin notifier =
+    FlutterLocalNotificationsPlugin();
 final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> initNotify() async {
@@ -24,7 +25,7 @@ Future<void> initNotify() async {
   const android = AndroidInitializationSettings('@mipmap/ic_launcher');
   const ios = DarwinInitializationSettings();
 
-  await _notifier.initialize(
+  await notifier.initialize(
     const InitializationSettings(
       android: android,
       iOS: ios,
@@ -36,8 +37,14 @@ Future<void> initNotify() async {
     },
   );
 
+  // Request Android 13+ permission
+  await notifier
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
+
   // Request iOS permissions
-  await _notifier
+  await notifier
       .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin>()
       ?.requestPermissions(
@@ -45,12 +52,6 @@ Future<void> initNotify() async {
         badge: true,
         sound: true,
       );
-
-  // Request Android 13+ permission
-  await _notifier
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.requestNotificationsPermission();
 }
 
 /// Schedules either a one-off reminder at [hour]:[minute], or (with
@@ -94,7 +95,7 @@ Future<void> scheduledOnTime({
   );
 
   // 3️⃣ Actually schedule
-  await _notifier.zonedSchedule(id, title, body, scheduled, notifDetails,
+  await notifier.zonedSchedule(id, title, body, scheduled, notifDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime,
@@ -133,7 +134,7 @@ Future<void> scheduledAt({
     iOS: iosDetails,
   );
 
-  await _notifier.zonedSchedule(
+  await notifier.zonedSchedule(
     id, title, body, scheduled, notifDetails,
     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     uiLocalNotificationDateInterpretation:
@@ -168,7 +169,7 @@ Future<void> scheduledRemind({
     iOS: iosDetails,
   );
 
-  await _notifier.zonedSchedule(
+  await notifier.zonedSchedule(
     id, title, body, scheduled, notifDetails,
     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     uiLocalNotificationDateInterpretation:
@@ -205,7 +206,7 @@ Future<void> showSimpleNotification({
     iOS: iosDetails,
   );
 
-  await _notifier.show(
+  await notifier.show(
     id ?? 0,
     title ?? 'Hello!',
     body ?? 'This is a test notification.',

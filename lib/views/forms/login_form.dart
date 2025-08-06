@@ -1,9 +1,9 @@
 import 'package:dart_backend/controllers/auth_controller.dart';
-import 'package:dart_backend/models/login_request.dart';
+import 'package:dart_backend/models/login_response.dart';
 import 'package:dart_backend/utils/index.dart';
-import 'package:dart_backend/utils/toastification.dart';
-import 'package:dart_backend/views/widgets/auth_form.dart';
-import 'package:dart_backend/views/widgets/input_form.dart';
+import 'package:dart_backend/views/functions/toastification.dart';
+import 'package:dart_backend/views/widgets/components/auth_form.dart';
+import 'package:dart_backend/views/widgets/components/input_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -46,7 +46,7 @@ class _LoginFormState extends State<LoginForm> {
     // 2️⃣ Prepare request
     final email = _email.text.trim();
     final password = _password.text;
-    final req = LoginRequest(email: email, password: password);
+    final req = LoginResponse(email: email, password: password);
 
     // 3️⃣ Attempt login
     await _controller.login(req, _rememberMe);
@@ -68,7 +68,7 @@ class _LoginFormState extends State<LoginForm> {
       _password.clear();
       debugPrint(err);
     } else {
-      Get.offAllNamed('/app-shell', arguments: UserParams(info: me));
+      Get.offAllNamed('/app-shell', arguments: UserParams(state: me));
       showToast(
         context,
         title: 'Welcome!',

@@ -1,10 +1,10 @@
-import 'package:dart_backend/models/user.dart';
-import 'package:dart_backend/views/widgets/auth_form.dart';
-import 'package:dart_backend/views/widgets/input_form.dart';
+import 'package:dart_backend/models/user_response.dart';
+import 'package:dart_backend/views/widgets/components/auth_form.dart';
+import 'package:dart_backend/views/widgets/components/input_form.dart';
 import 'package:flutter/material.dart';
 
 class RegisterForm extends StatefulWidget {
-  final Future<void> Function(User req) onSubmit;
+  final Future<void> Function(UserResponse req) onSubmit;
 
   const RegisterForm({super.key, required this.onSubmit});
 
@@ -55,11 +55,10 @@ class _RegisterFormState extends State<RegisterForm> {
         final password = _password.text;
 
         // Build the model here
-        final req = User(
+        final req = UserResponse(
           name: name,
           email: email,
           password: password,
-          role: true,
         );
 
         // And hand it off to the parent

@@ -13,8 +13,8 @@ class GenericTableSource<T> extends DataTableSource {
     this.isSelected,
     this.onEdit,
     this.onDelete,
-  }) : _allItems = List.from(items),
-       _filteredItems = List.from(items);
+  })  : _allItems = List.from(items),
+        _filteredItems = List.from(items);
 
   /// call this when the search query changes
   void filter(String query) {
@@ -92,18 +92,53 @@ class GenericTableSource<T> extends DataTableSource {
     if (onEdit != null || onDelete != null) {
       cells.add(
         DataCell(
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_outlined),
+            onSelected: (choice) {
+              if (choice == 'edit') {
+                onEdit?.call(item);
+              } else if (choice == 'delete') {
+                onDelete?.call(item);
+              }
+            },
+            itemBuilder: (ctx) => [
               if (onEdit != null)
-                IconButton(
-                  icon: Icon(Icons.edit_document),
-                  onPressed: () => onEdit!(item),
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.edit_document,
+                        color: Theme.of(ctx).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Edit',
+                        style: TextStyle(
+                          color: Theme.of(ctx).colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               if (onDelete != null)
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => onDelete!(item),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete,
+                        color: Theme.of(ctx).colorScheme.error,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Theme.of(ctx).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),

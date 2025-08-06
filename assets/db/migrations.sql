@@ -5,18 +5,36 @@ CREATE TABLE
         name TEXT NOT NULL,
         email TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
-        remember INTEGER NOT NULL,
-        role INTEGER NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        --['Male', 'Female', 'Other'];
+        sex INTEGER NOT NULL DEFAULT 0 CHECK (sex IN (0, 1, 2)),
+        avatar TEXT NULL,
+        dob TEXT NULL,
+        phone TEXT NULL,
+        remember INTEGER NOT NULL DEFAULT 0,
+        status INTEGER NOT NULL DEFAULT 1,
+        role INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
 --TASK TABLE
 CREATE TABLE
     tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        done INTEGER NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        name TEXT NOT NULL,
+        note TEXT NULL,
+        due_date TEXT NULL,
+        attachments TEXT NULL,
+        assigned_to INTEGER NOT NULL,
+        color INTEGER NOT NULL DEFAULT 0xFF2196F3,
+        started_at TEXT NOT NULL,
+        ended_at TEXT NOT NULL,
+        --"Pending," "In Progress," "Completed," "Failed").
+        status INTEGER NOT NULL DEFAULT 0 CHECK (status IN (0, 1, 2, 3)),
+        -- (e.g., "High," "Medium," "Low").
+        priority INTEGER NOT NULL DEFAULT 0 CHECK (priority IN (0, 1, 2)),
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
 --EVENT TABLE

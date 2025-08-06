@@ -1,26 +1,27 @@
 import 'dart:convert';
 
-import 'package:dart_backend/data/event_db_helper.dart';
-import 'package:dart_backend/models/event.dart';
+import 'package:dart_backend/services/event_request.dart';
+import 'package:dart_backend/models/event_response.dart';
+import 'package:dart_backend/utils/notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class EventController extends GetxController {
-  final _db = EventDbHelper();
+  final _db = EventRequest();
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
-  final RxList<Event> states = <Event>[].obs;
-  final Rxn<Event> currentEvent = Rxn<Event>();
+  final RxList<EventResponse> states = <EventResponse>[].obs;
+  final Rxn<EventResponse> currentEvent = Rxn<EventResponse>();
 
   // filters:
   final selectedDate = DateTime.now().obs;
   final selectedRepeat = RepeatRule.none.obs;
-  final selectedStatus = EventStatus.pending.obs;
+  final selectedStatus = Status.pending.obs;
 
   // computed list after applying the three filters
-  RxList<Event> get filteredEvents => _filteredEvents;
-  final RxList<Event> _filteredEvents = <Event>[].obs;
+  RxList<EventResponse> get filteredEvents => _filteredEvents;
+  final RxList<EventResponse> _filteredEvents = <EventResponse>[].obs;
 
   @override
   void onInit() {
@@ -51,7 +52,7 @@ class EventController extends GetxController {
       final matchesDate = DateTime(sameDay.year, sameDay.month, sameDay.day) ==
           DateTime(date.year, date.month, date.day);
       final matchesRepeat = (rep == RepeatRule.none) || e.repeatRule == rep;
-      final matchesStatus = (stat == EventStatus.pending) || e.status == stat;
+      final matchesStatus = (stat == Status.pending) || e.status == stat;
       return matchesDate && matchesRepeat && matchesStatus;
     }).toList();
 
@@ -61,7 +62,6 @@ class EventController extends GetxController {
   }
 
   void _scheduleNotifications() {
-    final notifier = FlutterLocalNotificationsPlugin();
     // cancel all old reminders first (you could track IDs instead)
     notifier.cancelAll();
 
@@ -70,7 +70,7 @@ class EventController extends GetxController {
       final dt = DateTime.parse(e.eventDate);
       final start = DateTime.parse(e.startTime);
 
-      final scheduled = tz.TZDateTime(
+      var scheduled = tz.TZDateTime(
         tz.local,
         dt.year,
         dt.month,
@@ -79,27 +79,37 @@ class EventController extends GetxController {
         start.minute,
       );
 
-      if (scheduled.isAfter(now)) {
-        notifier.zonedSchedule(
-          e.id!,
-          e.title,
-          e.note ?? '',
-          scheduled,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              'reminder',
-              'Reminders',
-              channelDescription: 'Event reminder',
-            ),
-            iOS: DarwinNotificationDetails(),
-          ),
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.wallClockTime,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.dateAndTime,
-          payload: jsonEncode({'route': '/event/detail', 'id': e.id}),
-        );
+      // ← If that time is already past today, bump it to tomorrow
+      if (scheduled.isBefore(now)) {
+        scheduled = scheduled.add(const Duration(days: 1));
       }
+
+      notifier.zonedSchedule(
+        e.id!,
+        e.title,
+        e.note ?? '',
+        scheduled,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'reminder_channel', // channel id
+            'Reminders', // channel name
+            channelDescription: 'Scheduled event reminders',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentSound: true,
+            presentBadge: true,
+          ),
+        ),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.wallClockTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: jsonEncode({'route': '/events/detail', 'id': e.id}),
+      );
     }
   }
 
@@ -137,7 +147,7 @@ class EventController extends GetxController {
   }
 
   /// CREATE
-  Future<void> store(Event req) async {
+  Future<void> store(EventResponse req) async {
     try {
       isLoading.value = true;
       final res = await _db.make(req);
@@ -154,7 +164,7 @@ class EventController extends GetxController {
   }
 
   /// UPDATE
-  Future<void> change(Event req) async {
+  Future<void> change(EventResponse req) async {
     try {
       isLoading.value = true;
       await _db.release(req);

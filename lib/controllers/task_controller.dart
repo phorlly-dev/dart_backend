@@ -1,10 +1,10 @@
-import 'package:dart_backend/data/task_db_helper.dart';
-import 'package:dart_backend/models/task.dart';
+import 'package:dart_backend/services/task_request.dart';
+import 'package:dart_backend/models/task_response.dart';
 import 'package:get/get.dart';
 
 class TaskController extends GetxController {
-  final _db = TaskDbHelper();
-  final RxList<Task> states = <Task>[].obs;
+  final _db = TaskRequest();
+  final RxList<TaskResponse> states = <TaskResponse>[].obs;
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
@@ -29,7 +29,7 @@ class TaskController extends GetxController {
   }
 
   /// FETCH ONE
-  Future<Task?> show(int id) async {
+  Future<TaskResponse?> show(int id) async {
     try {
       isLoading.value = true;
       final res = await _db.retrieve(id);
@@ -43,7 +43,7 @@ class TaskController extends GetxController {
   }
 
   /// CREATE
-  Future<void> store(Task req) async {
+  Future<void> store(TaskResponse req) async {
     try {
       isLoading.value = true;
       final res = await _db.make(req);
@@ -62,7 +62,7 @@ class TaskController extends GetxController {
   }
 
   /// UPDATE
-  Future<void> change(Task req) async {
+  Future<void> change(TaskResponse req) async {
     try {
       isLoading.value = true;
       await _db.release(req);

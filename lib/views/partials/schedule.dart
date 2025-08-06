@@ -1,11 +1,11 @@
 import 'package:calendar_timeline/calendar_timeline.dart';
 import 'package:dart_backend/controllers/event_controller.dart';
-import 'package:dart_backend/models/event.dart';
+import 'package:dart_backend/models/event_response.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/views/functions/index.dart';
 import 'package:dart_backend/views/partials/event_card.dart';
-import 'package:dart_backend/views/widgets/action_button.dart';
-import 'package:dart_backend/views/widgets/select_option.dart';
+import 'package:dart_backend/views/widgets/components/action_button.dart';
+import 'package:dart_backend/views/widgets/components/select_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -31,19 +31,18 @@ class Schedule extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ActionButton(
-                      radiusBtn: 8,
-                      labelBtn: 'Today',
-                      iconBtn: Icons.today,
-                      onPressed: () => ctrl.selectedDate.value = DateTime.now(),
+                      borderRadius: 8,
+                      label: 'Today',
+                      icon: Icons.today,
+                      onSubmit: () => ctrl.selectedDate.value = DateTime.now(),
                     ),
                     ActionButton(
-                      labelBtn: 'Add New',
-                      iconBtn: Icons.add_circle,
-                      colorBtn: colors.inversePrimary,
-                      onPressed: () {
-                        Get.toNamed(
-                          '/event/create-or-edit',
-                          preventDuplicates: false,
+                      label: 'Add New',
+                      icon: Icons.add_circle,
+                      color: colors.inversePrimary,
+                      onSubmit: () async {
+                        await Get.toNamed(
+                          '/events/create-or-edit',
                           arguments: EventParams(payload: ctrl),
                         );
                       },
@@ -76,10 +75,10 @@ class Schedule extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: SelectOption<EventStatus>(
+                      child: SelectOption<Status>(
                         label: 'Status',
                         hint: ctrl.selectedStatus.value.label,
-                        options: EventStatus.values.map((s) {
+                        options: Status.values.map((s) {
                           return DropdownMenuItem(
                             value: s,
                             child: Text(
@@ -100,7 +99,7 @@ class Schedule extends StatelessWidget {
 
                 // ── Calendar ──────────────────────────────
                 Obx(() {
-                  final selected = ctrl.selectedDate.value;
+                  var selected = ctrl.selectedDate.value;
                   // does any event fall on that selected day?
                   final hasEvent = ctrl.states.any((e) {
                     final d = DateTime.parse(e.eventDate);
@@ -126,12 +125,13 @@ class Schedule extends StatelessWidget {
                     monthColor: colors.outline,
                     dayColor:
                         Get.isDarkMode ? Colors.grey[600] : Colors.teal[200],
-                    dayNameColor: hasEvent ? const Color(0xFF333A47) : null,
-                    activeDayColor: hasEvent ? Colors.tealAccent : null,
-                    activeBackgroundDayColor: hasEvent
-                        ? Colors.blueAccent[200]
-                        : Colors.redAccent[100],
-                    dotColor: hasEvent ? null : Colors.redAccent[100],
+                    dayNameColor:
+                        hasEvent ? colors.onSurface : colors.onSecondary,
+                    activeDayColor:
+                        hasEvent ? colors.surface : colors.inversePrimary,
+                    activeBackgroundDayColor:
+                        hasEvent ? colors.primary : colors.secondary,
+                    dotColor: hasEvent ? null : colors.secondary,
                   );
                 }),
                 const SizedBox(height: 24),
@@ -162,8 +162,8 @@ class Schedule extends StatelessWidget {
     );
   }
 
-  Widget _showEvent(
-      BuildContext ctx, EventController payload, Event state, int index) {
+  Widget _showEvent(BuildContext ctx, EventController payload,
+      EventResponse state, int index) {
     return AnimationConfiguration.staggeredList(
       position: index,
       // ↑ this is the total time for the whole stagger sequence
@@ -182,11 +182,12 @@ class Schedule extends StatelessWidget {
             event: state,
             backgroundColor: state.color,
             onLongPress: () => _showBottomSheet(ctx, payload, state),
-            onTap: () => Get.toNamed(
-              '/event/detail',
-              preventDuplicates: false,
-              arguments: state.id,
-            ),
+            onTap: () async {
+              await Get.toNamed(
+                '/events/detail',
+                arguments: state.id,
+              );
+            },
           ),
         ),
       ),
@@ -194,36 +195,35 @@ class Schedule extends StatelessWidget {
   }
 
   void _showBottomSheet(
-      BuildContext ctx, EventController payload, Event state) {
+      BuildContext ctx, EventController payload, EventResponse state) {
     final colors = Theme.of(ctx).colorScheme;
 
     showSottomShee(height: .2, children: [
       ActionButton(
-        widthBtn: .8.w,
-        labelBtn: 'Edit',
-        colorBtn: colors.outline,
-        iconBtn: Icons.edit_document,
+        width: .8.w,
+        label: 'Edit',
+        color: colors.outline,
+        icon: Icons.edit_document,
         iconSize: 20,
         textSize: 18,
-        onPressed: () async {
+        onSubmit: () async {
           await Get.toNamed(
-            '/event/create-or-edit',
-            preventDuplicates: false,
+            '/events/create-or-edit',
             arguments: EventParams(state: state, payload: payload),
           );
           Get.back();
         },
       ),
       ActionButton(
-        widthBtn: .8.w,
-        colorBtn: colors.error,
-        labelBtn: 'Delete',
-        iconBtn: Icons.delete,
+        width: .8.w,
+        color: colors.error,
+        label: 'Delete',
+        icon: Icons.delete,
         iconSize: 20,
         textSize: 18,
-        onPressed: () async {
+        onSubmit: () async {
           Get.back();
-          await confirmDelete<Event>(
+          await confirmDelete<EventResponse>(
             ctx,
             title: state.title,
             onConfirm: () async {
@@ -233,13 +233,13 @@ class Schedule extends StatelessWidget {
         },
       ),
       ActionButton(
-        widthBtn: .8.w,
-        labelBtn: 'Close',
-        colorBtn: colors.scrim,
-        iconBtn: Icons.close,
+        width: .8.w,
+        label: 'Close',
+        color: colors.scrim,
+        icon: Icons.close,
         iconSize: 20,
         textSize: 18,
-        onPressed: () => Get.back(),
+        onSubmit: () => Get.back(),
       ),
     ]);
   }

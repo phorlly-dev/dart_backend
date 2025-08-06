@@ -1,11 +1,12 @@
-import 'package:dart_backend/data/user_db_helper.dart';
-import 'package:dart_backend/models/user.dart';
+import 'package:dart_backend/services/user_request.dart';
+import 'package:dart_backend/models/user_response.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController {
-  final _db = UserDbHelper();
-  final RxList<User> states = <User>[].obs;
+  final _db = UserRequest();
+  final RxList<UserResponse> states = <UserResponse>[].obs;
+  final Rxn<UserResponse> currentUser = Rxn<UserResponse>();
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
@@ -13,6 +14,13 @@ class UserController extends GetxController {
   void onInit() {
     super.onInit();
     index();
+  }
+
+  // Expose only those users _other_ than the one who’s logged in:
+  List<UserResponse> get visibleUsers {
+    final me = currentUser.value;
+    if (me == null) return states;
+    return states.where((u) => u.id != me.id).toList();
   }
 
   /// FETCH ALL
@@ -30,7 +38,7 @@ class UserController extends GetxController {
   }
 
   /// FETCH ONE
-  Future<User?> show(int id) async {
+  Future<UserResponse?> show(int id) async {
     try {
       isLoading.value = true;
       final res = await _db.retrieve(id);
@@ -44,7 +52,7 @@ class UserController extends GetxController {
   }
 
   /// CREATE
-  Future<void> store(User req) async {
+  Future<void> store(UserResponse req) async {
     try {
       isLoading.value = true;
       final hashed = hashPwd(req.password);
@@ -65,7 +73,7 @@ class UserController extends GetxController {
   }
 
   /// UPDATE
-  Future<void> change(User req) async {
+  Future<void> change(UserResponse req) async {
     try {
       isLoading.value = true;
       await _db.release(req);

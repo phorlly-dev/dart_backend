@@ -1,11 +1,11 @@
-import 'package:dart_backend/models/event.dart';
+import 'package:dart_backend/models/event_response.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:flutter/material.dart';
 
 /// A card that displays an event's details: title, time range, notes, and status.
 class EventCard extends StatelessWidget {
   /// The event to display
-  final Event event;
+  final EventResponse event;
 
   /// Background color of the card
   final Color backgroundColor;

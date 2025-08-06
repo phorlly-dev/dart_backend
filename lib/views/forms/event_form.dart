@@ -1,10 +1,10 @@
 import 'package:dart_backend/controllers/event_controller.dart';
-import 'package:dart_backend/models/event.dart';
+import 'package:dart_backend/models/event_response.dart';
 import 'package:dart_backend/utils/index.dart';
-import 'package:dart_backend/utils/toastification.dart';
-import 'package:dart_backend/views/widgets/input_field.dart';
-import 'package:dart_backend/views/widgets/select_option.dart';
-import 'package:dart_backend/views/widgets/submit_form.dart';
+import 'package:dart_backend/views/functions/toastification.dart';
+import 'package:dart_backend/views/widgets/components/input_field.dart';
+import 'package:dart_backend/views/widgets/components/select_option.dart';
+import 'package:dart_backend/views/widgets/components/submit_form.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
 class EventForm extends StatefulWidget {
-  final Event? model;
+  final EventResponse? model;
   final EventController controller;
 
   const EventForm({super.key, this.model, required this.controller});
@@ -23,7 +23,7 @@ class EventForm extends StatefulWidget {
 
 class _EventFormState extends State<EventForm> {
   final _formKey = GlobalKey<FormState>();
-  late final Event? _model;
+  late EventResponse? _model;
   late final EventController _controller;
   late final TextEditingController _name;
   late final TextEditingController _note;
@@ -31,7 +31,7 @@ class _EventFormState extends State<EventForm> {
   final remindOptions = [5, 10, 15, 20];
   late Color _color;
   late DateTime _date, _start, _end;
-  late EventStatus _status;
+  late Status _status;
   late RepeatRule _repeat;
 
   @override
@@ -44,13 +44,22 @@ class _EventFormState extends State<EventForm> {
     _note = TextEditingController(text: _model?.note ?? '');
     _remind = _model?.remindMin ?? 5;
     _repeat = _model?.repeatRule ?? RepeatRule.none;
-    _status = _model?.status ?? EventStatus.pending;
+    _status = _model?.status ?? Status.pending;
     _color = _model?.color ?? Colors.green;
     _date = _model?.eventDate == null ? dateNow() : strDate(_model!.eventDate);
-    _start = _model?.startTime == null ? dateNow() : strDate(_model!.startTime);
+    _start = _model?.startTime == null
+        ? dateNow().add(const Duration(minutes: 5))
+        : strDate(_model!.startTime);
     _end = _model?.endTime == null
         ? dateNow().add(const Duration(minutes: 10))
         : strDate(_model!.endTime);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _name.dispose();
+    _note.dispose();
   }
 
   @override
@@ -70,7 +79,7 @@ class _EventFormState extends State<EventForm> {
 
         if (_model == null) {
           await _controller.store(
-            Event(
+            EventResponse(
               title: name,
               note: note,
               eventDate: date,
@@ -117,6 +126,7 @@ class _EventFormState extends State<EventForm> {
               remindMin: _remind,
               repeatRule: _repeat,
               status: _status,
+              updatedAt: dateNow().toIso8601String(),
             ),
           );
           if (!context.mounted) return;
@@ -148,8 +158,9 @@ class _EventFormState extends State<EventForm> {
       children: [
         InputField(
           label: 'Title',
-          controller: _name,
           autofocus: true,
+          name: _model?.title ?? '',
+          onSaved: (val) => _model!.title = val!,
           validator: (v) =>
               (v == null || v.isEmpty) ? 'This field is required' : null,
         ),
@@ -157,8 +168,10 @@ class _EventFormState extends State<EventForm> {
         _selectOption(),
         InputField(
           label: 'Note',
-          controller: _note,
-          maxLines: 2,
+          name: _model?.note ?? '',
+          onSaved: (val) => _model?.note = val,
+          inputType: TextInputType.multiline,
+          maxLines: null,
           validator: (v) =>
               (v == null || v.isEmpty) ? 'This field is required' : null,
         ),
@@ -206,6 +219,9 @@ class _EventFormState extends State<EventForm> {
                 onChange: (dateTime) {
                   setState(() {
                     _start = dateTime;
+                    if (_start.isAfter(_end)) {
+                      _end = dateTime.add(const Duration(minutes: 5));
+                    }
                   });
                 },
                 timeFormat: 'h:m a',
@@ -276,11 +292,11 @@ class _EventFormState extends State<EventForm> {
             _repeat = value!;
           }),
         ),
-        SelectOption<EventStatus>(
+        SelectOption<Status>(
           label: 'Status',
           hint: _status.label,
-          options: EventStatus.values.map((item) {
-            return DropdownMenuItem<EventStatus>(
+          options: Status.values.map((item) {
+            return DropdownMenuItem<Status>(
               value: item,
               child: Text(
                 item.label,

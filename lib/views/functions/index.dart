@@ -1,4 +1,4 @@
-import 'package:dart_backend/utils/toastification.dart';
+import 'package:dart_backend/views/functions/toastification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

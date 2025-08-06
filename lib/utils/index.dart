@@ -1,7 +1,11 @@
 import 'package:bcrypt/bcrypt.dart';
 import 'package:dart_backend/controllers/event_controller.dart';
-import 'package:dart_backend/models/event.dart';
-import 'package:dart_backend/models/user.dart';
+import 'package:dart_backend/controllers/task_controller.dart';
+import 'package:dart_backend/controllers/user_controller.dart';
+import 'package:dart_backend/models/event_response.dart';
+import 'package:dart_backend/models/task_response.dart';
+import 'package:dart_backend/models/user_response.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -18,37 +22,37 @@ final bgList = [
   "assets/images/bg8.jpeg",
 ];
 
-enum Status { pending, loading, completed, failed, cancel }
+class UserParams {
+  final int? id;
+  final UserResponse? state;
+  final UserController? payload;
 
-class StatusItem {
-  final int id;
-  final String name;
-  final Status status;
-
-  const StatusItem({
-    required this.id,
-    required this.name,
-    required this.status,
-  });
+  UserParams({this.id, this.state, this.payload});
 }
 
-final statusList = [
-  StatusItem(id: 0, name: 'Pending...', status: Status.pending),
-  StatusItem(id: 1, name: 'Loading...', status: Status.loading),
-  StatusItem(id: 2, name: 'Completed', status: Status.completed),
-  StatusItem(id: 3, name: 'Failed', status: Status.failed),
-  StatusItem(id: 4, name: 'Cancel', status: Status.cancel),
-];
+class TaskParams {
+  final int? id;
+  final TaskResponse? state;
+  final TaskController? payload;
 
-class UserParams {
-  final User? info;
+  TaskParams({this.id, this.state, this.payload});
+}
 
-  UserParams({this.info});
+class TabViewPages {
+  final List<Widget> pages;
+  final List<IconData>? icons;
+  final List<String?> labels;
+
+  TabViewPages({
+    this.icons,
+    required this.labels,
+    required this.pages,
+  });
 }
 
 class EventParams {
   final int? id;
-  final Event? state;
+  final EventResponse? state;
   final EventController? payload;
 
   EventParams({this.id, this.state, this.payload});
@@ -137,32 +141,3 @@ T? loadParams<T>(
 
   return null;
 }
-
-
-        // return DataTableView<Task>(
-        //   items: ctrl.tasks,
-        //   isLoading: ctrl.isLoading.value,
-        //   hasError: ctrl.errorMessage.value,
-        //   notFound: ctrl.tasks,
-        //   isSelected: (t) => t.done,
-        //   columns: const [
-        //     DataColumn(label: Text('Id')),
-        //     DataColumn(label: Text('Title')),
-        //     DataColumn(label: Text('Done')),
-        //   ],
-        //   rowBuilder: (t, i) => [
-        //     DataCell(Text('${i + 1}')),
-        //     DataCell(Text(t.title)),
-        //     DataCell(
-        //       Checkbox(
-        //         value: t.done,
-        //         onChanged: (v) => ctrl.change(t.copyWith(done: v!)),
-        //       ),
-        //     ),
-        //   ],
-        //   onEdit: (t) => taskForm(context, task: t),
-        //   onDelete: (t) => confirmDelete<Task>(
-        //     title: t.title,
-        //     onConfirm: () async => await ctrl.remove(t.id!),
-        //   ),
-        // );
