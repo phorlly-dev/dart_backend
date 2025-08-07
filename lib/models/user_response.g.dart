@@ -9,7 +9,7 @@ part of 'user_response.dart';
 UserResponse _$UserResponseFromJson(Map<String, dynamic> json) => UserResponse(
       sex: $enumDecodeNullable(_$SexEnumMap, json['sex']) ?? Sex.male,
       id: (json['id'] as num?)?.toInt(),
-      dob: json['dob'] as String?,
+      dob: strToDt(json['dob'] as String),
       avatar: json['avatar'] as String?,
       phone: json['phone'] as String?,
       name: json['name'] as String,
@@ -18,8 +18,8 @@ UserResponse _$UserResponseFromJson(Map<String, dynamic> json) => UserResponse(
       role: json['role'] as bool? ?? false,
       status: json['status'] as bool? ?? true,
       remember: json['remember'] as bool? ?? false,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      createdAt: strToDt(json['created_at'] as String),
+      updatedAt: strToDt(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$UserResponseToJson(UserResponse instance) =>
@@ -31,12 +31,12 @@ Map<String, dynamic> _$UserResponseToJson(UserResponse instance) =>
       'password': instance.password,
       'avatar': instance.avatar,
       'phone': instance.phone,
-      'dob': instance.dob,
       'remember': instance.remember,
       'role': instance.role,
       'status': instance.status,
-      'created_at': instance.createdAt,
-      'updated_at': instance.updatedAt,
+      'dob': dtToStr(instance.dob),
+      'created_at': dtToStr(instance.createdAt),
+      'updated_at': dtToStr(instance.updatedAt),
     };
 
 const _$SexEnumMap = {

@@ -30,9 +30,9 @@ class EventCard extends StatelessWidget {
     final texts = Theme.of(context).textTheme;
 
     // Format start and end times
-    final start = timeStr(event.startTime);
-    final end = timeStr(event.endTime);
-    final date = dateStr(strDate(event.eventDate));
+    final start = dtToTm(event.startTime);
+    final end = dtToTm(event.endTime);
+    final date = dtToTx(event.eventDate);
 
     return GestureDetector(
       onTap: onTap,

@@ -5,7 +5,6 @@ CREATE TABLE
         name TEXT NOT NULL,
         email TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
-        --['Male', 'Female', 'Other'];
         sex INTEGER NOT NULL DEFAULT 0 CHECK (sex IN (0, 1, 2)),
         avatar TEXT NULL,
         dob TEXT NULL,
@@ -15,6 +14,17 @@ CREATE TABLE
         role INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+INSERT INTO
+    users (name, email, password, role, phone)
+VALUES
+    (
+        'John Doe',
+        'dev@g.me',
+        '$2a$10$Oe62oGW/JqFqkFyBGe8e/.VySW9C.4E3mohYSx1sK5yYvHqPuRnQm',
+        1,
+        '088 92 32 000'
     );
 
 --TASK TABLE
@@ -63,3 +73,12 @@ CREATE TABLE
 
 -- index for fast date lookups
 CREATE INDEX idx_events_event_date ON events (event_date);
+
+-- CREATE TRIGGER set_events_updated_at
+-- AFTER UPDATE ON events
+-- FOR EACH ROW
+-- BEGIN
+--   UPDATE events
+--     SET updated_at = CURRENT_TIMESTAMP
+--     WHERE id = NEW.id;
+-- END;

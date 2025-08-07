@@ -16,15 +16,15 @@ EventResponse _$EventResponseFromJson(Map<String, dynamic> json) =>
               RepeatRule.none,
       color: json['color'] == null
           ? const Color(0xFF2196F3)
-          : EventResponse._colorFromInt((json['color'] as num).toInt()),
+          : colorFromInt((json['color'] as num).toInt()),
       status: $enumDecodeNullable(_$StatusEnumMap, json['status']) ??
           Status.pending,
       remindMin: (json['remind_min'] as num?)?.toInt() ?? 5,
-      eventDate: json['event_date'] as String,
-      startTime: json['start_time'] as String,
-      endTime: json['end_time'] as String,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      eventDate: strToDt(json['event_date'] as String),
+      startTime: strToDt(json['start_time'] as String),
+      endTime: strToDt(json['end_time'] as String),
+      createdAt: strToDt(json['created_at'] as String),
+      updatedAt: strToDt(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$EventResponseToJson(EventResponse instance) =>
@@ -33,14 +33,14 @@ Map<String, dynamic> _$EventResponseToJson(EventResponse instance) =>
       'title': instance.title,
       'note': instance.note,
       'repeat_rule': _$RepeatRuleEnumMap[instance.repeatRule]!,
-      'color': EventResponse._colorToInt(instance.color),
+      'color': colorToInt(instance.color),
       'status': _$StatusEnumMap[instance.status]!,
       'remind_min': instance.remindMin,
-      'event_date': instance.eventDate,
-      'start_time': instance.startTime,
-      'end_time': instance.endTime,
-      'created_at': instance.createdAt,
-      'updated_at': instance.updatedAt,
+      'event_date': dtToStr(instance.eventDate),
+      'start_time': dtToStr(instance.startTime),
+      'end_time': dtToStr(instance.endTime),
+      'created_at': dtToStr(instance.createdAt),
+      'updated_at': dtToStr(instance.updatedAt),
     };
 
 const _$RepeatRuleEnumMap = {

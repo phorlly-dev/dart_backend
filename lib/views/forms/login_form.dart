@@ -3,8 +3,10 @@ import 'package:dart_backend/models/login_response.dart';
 import 'package:dart_backend/utils/index.dart';
 import 'package:dart_backend/views/functions/toastification.dart';
 import 'package:dart_backend/views/widgets/components/auth_form.dart';
+import 'package:dart_backend/views/widgets/components/chackbox_builder.dart';
 import 'package:dart_backend/views/widgets/components/input_form.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
 
 class LoginForm extends StatefulWidget {
@@ -17,66 +19,14 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _email;
-  late final TextEditingController _password;
+  final _formKey = GlobalKey<FormBuilderState>();
   late final AuthController _controller;
-  bool _rememberMe = false;
-  bool _passwordVisible = true;
+  bool _visPass = true;
 
   @override
   void initState() {
     super.initState();
     _controller = widget.controller;
-    _email = TextEditingController();
-    _password = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
-  }
-
-  void _submit(BuildContext context) async {
-    // 1️⃣ Validate form
-    if (!_formKey.currentState!.validate()) return;
-
-    // 2️⃣ Prepare request
-    final email = _email.text.trim();
-    final password = _password.text;
-    final req = LoginResponse(email: email, password: password);
-
-    // 3️⃣ Attempt login
-    await _controller.login(req, _rememberMe);
-
-    // 4️⃣ **After** login, read the updated state
-    final err = _controller.errorMessage.value;
-    final me = _controller.currentUser.value;
-
-    if (!context.mounted) return;
-
-    // 5️⃣ Branch on success vs. failure
-    if (me == null && err.isNotEmpty) {
-      showToast(
-        context,
-        type: Toast.error,
-        title: 'Authentication error!',
-        message: err,
-      );
-      _password.clear();
-      debugPrint(err);
-    } else {
-      Get.offAllNamed('/app-shell', arguments: UserParams(state: me));
-      showToast(
-        context,
-        title: 'Welcome!',
-        message: 'You have successfully logged in.',
-      );
-
-      _formKey.currentState!.reset();
-    }
   }
 
   @override
@@ -84,17 +34,38 @@ class _LoginFormState extends State<LoginForm> {
     return AuthForm(
       formKey: _formKey,
       children: [
-        _emailField(),
-        _passwordField(),
-        CheckboxListTile(
-          value: _rememberMe,
-          checkColor: Colors.white,
-          onChanged: (v) => setState(() => _rememberMe = v!),
-          title: const Text(
-            'Remember me',
-            style: TextStyle(color: Colors.white),
-          ),
-          controlAffinity: ListTileControlAffinity.leading,
+        InputForm(
+          name: 'email',
+          label: 'Email Address',
+          icon: Icons.mail,
+          trimVal: (val) => val!.trim(),
+          inputType: TextInputType.emailAddress,
+          autofocus: true,
+          validator: (v) {
+            if (v == null || v.isEmpty) return 'Email is required';
+
+            final emailRE = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+            if (!emailRE.hasMatch(v)) return 'Enter a valid email';
+
+            return null;
+          },
+        ),
+        InputForm(
+          name: 'password',
+          label: 'Password',
+          icon: Icons.lock,
+          inputType: TextInputType.visiblePassword,
+          validator: (v) {
+            if (v == null || v.isEmpty) return 'Password is required';
+            if (v.length < 6) return 'Must be at least 6 characters';
+            return null;
+          },
+          obscureText: _visPass,
+          visibleText: () => setState(() => _visPass = !_visPass),
+        ),
+        ChackboxBuilder(
+          name: 'remember',
+          label: 'Remember me',
         ),
         Align(
           alignment: Alignment.centerRight,
@@ -110,27 +81,35 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
       ],
-      onPressed: () => _submit(context),
+      onSubmit: () async {
+        final formState = _formKey.currentState;
+        if (formState?.saveAndValidate() ?? false) {
+          final err = _controller.errorMessage.value;
+          final me = _controller.currentUser.value;
+
+          final req = LoginResponse.fromJson(formState!.value);
+          await _controller.login(req);
+
+          if (!context.mounted) return;
+          if (me == null && err.isNotEmpty) {
+            showToast(
+              context,
+              type: Toast.error,
+              title: 'Authentication error!',
+              message: err,
+            );
+            debugPrint(err);
+          } else {
+            Get.offAllNamed('/app-shell', arguments: UserParams(state: me));
+            showToast(
+              context,
+              title: 'Welcome!',
+              message: 'You have successfully logged in.',
+            );
+            _formKey.currentState!.reset();
+          }
+        }
+      },
     );
   }
-
-  Widget _emailField() => InputForm(
-        controller: _email,
-        label: 'Email',
-        icon: Icons.mail,
-        inputType: TextInputType.emailAddress,
-        autofocus: true,
-        validator: (v) =>
-            (v != null && v.contains('@')) ? null : 'Enter a valid email',
-      );
-
-  Widget _passwordField() => InputForm(
-        controller: _password,
-        label: 'Password',
-        icon: Icons.lock,
-        validator: (v) =>
-            (v != null && v.length >= 6) ? null : 'Min 6 characters',
-        obscureText: _passwordVisible,
-        visibleText: () => setState(() => _passwordVisible = !_passwordVisible),
-      );
 }

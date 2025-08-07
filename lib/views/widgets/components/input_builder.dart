@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class InputFormBuilder extends StatelessWidget {
+class InputBuilder extends StatelessWidget {
   final String? label, initVal;
   final String name;
-  final IconData? icon;
   final int? maxLines;
   final double? width;
   final Color? iconColor, textColor, borderColor;
@@ -15,12 +14,12 @@ class InputFormBuilder extends StatelessWidget {
   final Widget? startedIcon, endedIcon;
   final FocusNode? focus;
   final AutovalidateMode? autovalidate;
+  final Function(String? val)? formatVal;
 
-  const InputFormBuilder({
+  const InputBuilder({
     super.key,
     this.width = 1,
     this.label,
-    this.icon,
     this.iconColor,
     this.textColor,
     this.borderColor,
@@ -37,6 +36,7 @@ class InputFormBuilder extends StatelessWidget {
     this.isBorderd = false,
     this.focus,
     this.autovalidate = AutovalidateMode.disabled,
+    this.formatVal,
   });
 
   @override
@@ -52,9 +52,10 @@ class InputFormBuilder extends StatelessWidget {
           border: isBorderd
               ? OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.white),
                 )
               : null,
-          labelText: label,
+          labelText: 'Enter $label',
         ),
         validator: validator,
         autofocus: autofocus,
@@ -64,6 +65,7 @@ class InputFormBuilder extends StatelessWidget {
         keyboardType: inputType,
         focusNode: focus,
         name: name,
+        valueTransformer: formatVal,
       ),
     );
   }

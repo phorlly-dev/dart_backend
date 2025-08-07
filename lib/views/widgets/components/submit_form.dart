@@ -24,8 +24,6 @@ class SubmitForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return Container(
       margin: EdgeInsets.only(left: 12, right: 12),
       child: SingleChildScrollView(
@@ -37,9 +35,9 @@ class SubmitForm extends StatelessWidget {
               ...children,
               const SizedBox(height: 24),
               ActionButton(
-                label: labelBtn ?? 'Save',
-                icon: iconBtn ?? Icons.save,
-                color: colorBtn ?? colors.primary,
+                label: labelBtn,
+                icon: iconBtn,
+                color: colorBtn,
                 onSubmit: onPressed,
                 width: widthBtn.w,
               ),

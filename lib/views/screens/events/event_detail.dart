@@ -58,9 +58,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       }
 
       // parse & format
-      final date = dateStr(strDate(event.eventDate));
-      final start = timeStr(event.startTime);
-      final end = timeStr(event.endTime);
+      final date = dtToTx(event.eventDate);
+      final start = dtToTm(event.startTime);
+      final end = dtToTm(event.endTime);
       final remind = '${event.remindMin} minutes early';
 
       return AppEntire(

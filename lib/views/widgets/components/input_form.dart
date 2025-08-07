@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InputForm extends StatelessWidget {
   final TextEditingController? controller;
   final String? label;
+  final String name;
   final IconData? icon;
   final Color? iconColor, textColor, borderColor;
   final String? Function(String?)? validator;
@@ -13,6 +15,7 @@ class InputForm extends StatelessWidget {
   final VoidCallback? visibleText;
   final double? width;
   final ValueChanged<String>? onChanged;
+  final String Function(String? val)? trimVal;
 
   const InputForm({
     super.key,
@@ -31,6 +34,8 @@ class InputForm extends StatelessWidget {
     this.visibleText,
     this.width = .8,
     this.onChanged,
+    required this.name,
+    this.trimVal,
   });
 
   @override
@@ -38,11 +43,10 @@ class InputForm extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10),
       width: width?.sw,
-      child: TextFormField(
+      child: FormBuilderTextField(
         controller: controller,
         obscureText: obscureText,
         obscuringCharacter: '*',
-        onChanged: onChanged,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
@@ -65,8 +69,10 @@ class InputForm extends StatelessWidget {
         validator: validator,
         autofocus: autofocus,
         readOnly: readOnly,
+        valueTransformer: trimVal,
         maxLines: maxLines,
         keyboardType: inputType,
+        name: name,
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:dart_backend/utils/index.dart';
+
 import '../models/task_response.dart';
 import 'db_request.dart';
 
@@ -10,5 +12,9 @@ class TaskRequest extends DbRequest<TaskResponse> {
 
   @override
   TaskResponse get blankModel => TaskResponse(
-      name: '', dueDate: '', startedAt: '', endedAt: '', assignedTo: 0);
+      name: '',
+      dueDate: dtNow(),
+      startedAt: dtNow(),
+      endedAt: dtNow(),
+      assignedTo: 0);
 }

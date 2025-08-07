@@ -7,8 +7,13 @@ part 'login_response.g.dart';
 class LoginResponse {
   final String email;
   final String password;
+  final bool remember;
 
-  LoginResponse({required this.email, required this.password});
+  LoginResponse({
+    required this.email,
+    required this.password,
+    this.remember = false,
+  });
 
   // json_serializable
   factory LoginResponse.fromJson(Map<String, dynamic> json) =>

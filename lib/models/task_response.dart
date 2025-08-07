@@ -1,4 +1,5 @@
 // import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:dart_backend/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../services/db_request.dart';
@@ -14,14 +15,14 @@ class TaskResponse implements IModel {
   final String name;
   final String? note, attachments;
 
-  @JsonKey(name: 'due_date')
-  final String dueDate;
+  @JsonKey(name: 'due_date', fromJson: strToDt, toJson: dtToStr)
+  final DateTime dueDate;
 
-  @JsonKey(name: 'started_at')
-  final String startedAt;
+  @JsonKey(name: 'started_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime startedAt;
 
-  @JsonKey(name: 'ended_at')
-  final String endedAt;
+  @JsonKey(name: 'ended_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime endedAt;
 
   @JsonKey(name: 'assigned_to')
   final int assignedTo;
@@ -33,14 +34,14 @@ class TaskResponse implements IModel {
   final Priority priority;
 
   /// Stored in DB as INTEGER ARGB
-  @JsonKey(fromJson: _colorFromInt, toJson: _colorToInt)
+  @JsonKey(fromJson: colorFromInt, toJson: colorToInt)
   final Color color;
 
-  @JsonKey(name: 'created_at')
-  final String createdAt; // full timestamp
+  @JsonKey(name: 'created_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime createdAt; // full timestamp
 
-  @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  @JsonKey(name: 'updated_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime updatedAt;
 
   TaskResponse({
     required this.name,
@@ -56,10 +57,10 @@ class TaskResponse implements IModel {
     this.id,
 
     // these will be filled by the DB defaults
-    String? createdAt,
-    String? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now().toIso8601String(),
-        updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : createdAt = createdAt ?? dtNow(),
+        updatedAt = updatedAt ?? dtNow();
 
   TaskResponse copyWith({
     int? id,
@@ -69,12 +70,12 @@ class TaskResponse implements IModel {
     Priority? priority,
     String? note,
     String? attachments,
-    String? dueDate,
-    String? startedAt,
-    String? endedAt,
+    DateTime? dueDate,
+    DateTime? startedAt,
+    DateTime? endedAt,
     int? assignedTo,
-    String? createdAt,
-    String? updatedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return TaskResponse(
       id: id ?? this.id,
@@ -103,16 +104,16 @@ class TaskResponse implements IModel {
         id: map['id'] as int?,
         name: map['name'] as String,
         note: map['note'] as String?,
-        dueDate: map['due_date'] as String,
+        dueDate: strToDt(map['due_date'] as String),
         attachments: map['attachments'] as String?,
         assignedTo: map['assigned_to'] as int,
         color: Color((map['color'] as int)),
         status: StatusX.fromCode(map['status'] as int),
         priority: PriorityX.fromCode(map['priority'] as int),
-        startedAt: map['started_at'] as String,
-        endedAt: map['ended_at'] as String,
-        createdAt: map['created_at'] as String,
-        updatedAt: map['updated_at'] as String,
+        startedAt: strToDt(map['started_at'] as String),
+        endedAt: strToDt(map['ended_at'] as String),
+        createdAt: strToDt(map['created_at'] as String),
+        updatedAt: strToDt(map['updated_at'] as String),
       );
 
   @override
@@ -120,17 +121,13 @@ class TaskResponse implements IModel {
         if (id != null) 'id': id,
         'name': name,
         'note': note,
-        'due_date': dueDate,
+        'due_date': dueDate.toIso8601String(),
         'attachments': attachments,
         'assigned_to': assignedTo,
-        'started_at': startedAt,
-        'ended_at': endedAt,
+        'started_at': startedAt.toIso8601String(),
+        'ended_at': endedAt.toIso8601String(),
         'status': status.code,
         'priority': priority.code,
         'color': color.toARGB32(),
       };
-
-  // helpers for json <-> Color
-  static Color _colorFromInt(int i) => Color(i);
-  static int _colorToInt(Color c) => c.toARGB32();
 }

@@ -43,7 +43,7 @@ class SideBar extends StatelessWidget {
                       style: TextStyle(fontSize: 13, color: Colors.white70),
                     ),
                     Text(
-                      'Created at: ${dateStr(strDate(me!.createdAt))}',
+                      'Created at: ${dtToTx(me!.createdAt)}',
                       style: TextStyle(fontSize: 12, color: Colors.white54),
                     )
                   ],

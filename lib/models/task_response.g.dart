@@ -10,9 +10,9 @@ TaskResponse _$TaskResponseFromJson(Map<String, dynamic> json) => TaskResponse(
       name: json['name'] as String,
       note: json['note'] as String?,
       attachments: json['attachments'] as String?,
-      dueDate: json['due_date'] as String,
-      startedAt: json['started_at'] as String,
-      endedAt: json['ended_at'] as String,
+      dueDate: strToDt(json['due_date'] as String),
+      startedAt: strToDt(json['started_at'] as String),
+      endedAt: strToDt(json['ended_at'] as String),
       assignedTo: (json['assigned_to'] as num).toInt(),
       status: $enumDecodeNullable(_$StatusEnumMap, json['status']) ??
           Status.pending,
@@ -20,10 +20,10 @@ TaskResponse _$TaskResponseFromJson(Map<String, dynamic> json) => TaskResponse(
           Priority.low,
       color: json['color'] == null
           ? const Color(0xFF2196F3)
-          : TaskResponse._colorFromInt((json['color'] as num).toInt()),
+          : colorFromInt((json['color'] as num).toInt()),
       id: (json['id'] as num?)?.toInt(),
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      createdAt: strToDt(json['created_at'] as String),
+      updatedAt: strToDt(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$TaskResponseToJson(TaskResponse instance) =>
@@ -32,15 +32,15 @@ Map<String, dynamic> _$TaskResponseToJson(TaskResponse instance) =>
       'name': instance.name,
       'note': instance.note,
       'attachments': instance.attachments,
-      'due_date': instance.dueDate,
-      'started_at': instance.startedAt,
-      'ended_at': instance.endedAt,
+      'due_date': dtToStr(instance.dueDate),
+      'started_at': dtToStr(instance.startedAt),
+      'ended_at': dtToStr(instance.endedAt),
       'assigned_to': instance.assignedTo,
       'status': _$StatusEnumMap[instance.status]!,
       'priority': _$PriorityEnumMap[instance.priority]!,
-      'color': TaskResponse._colorToInt(instance.color),
-      'created_at': instance.createdAt,
-      'updated_at': instance.updatedAt,
+      'color': colorToInt(instance.color),
+      'created_at': dtToStr(instance.createdAt),
+      'updated_at': dtToStr(instance.updatedAt),
     };
 
 const _$StatusEnumMap = {

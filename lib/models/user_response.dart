@@ -1,5 +1,6 @@
 // lib/models/task.dart
 // import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:dart_backend/utils/index.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../services/db_request.dart';
 
@@ -16,21 +17,25 @@ class UserResponse implements IModel {
   final Sex sex;
 
   final String name, email, password;
-  final String? avatar, phone, dob;
+  final String? avatar, phone;
+
   final bool remember;
   final bool role;
   final bool status;
 
-  @JsonKey(name: 'created_at')
-  final String createdAt;
+  @JsonKey(name: 'dob', fromJson: strToDt, toJson: dtToStr)
+  final DateTime dob;
 
-  @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  @JsonKey(name: 'created_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime createdAt;
+
+  @JsonKey(name: 'updated_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime updatedAt;
 
   UserResponse({
     this.sex = Sex.male,
     this.id,
-    this.dob,
+    DateTime? dob,
     this.avatar,
     this.phone,
     required this.name,
@@ -39,22 +44,23 @@ class UserResponse implements IModel {
     this.role = false,
     this.status = true,
     this.remember = false,
-    String? createdAt,
-    String? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now().toIso8601String(),
-        updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : dob = dob ?? dtNow(),
+        createdAt = createdAt ?? dtNow(),
+        updatedAt = updatedAt ?? dtNow();
 
   UserResponse copyWith({
     int? id,
     String? name,
-    String? dob,
+    DateTime? dob,
     String? avatar,
     String? phone,
     String? email,
     String? password,
     Sex? sex,
-    String? createdAt,
-    String? updatedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     bool? remember,
     bool? role,
     bool? status,
@@ -87,7 +93,7 @@ class UserResponse implements IModel {
         id: map['id'] as int?,
         name: map['name'] as String,
         email: map['email'] as String,
-        dob: map['dob'] as String?,
+        dob: map['dob'] != null ? strToDt(map['dob'] as String) : null,
         sex: SexX.fromCode(map['sex'] as int),
         avatar: map['avatar'] as String?,
         phone: map['phone'] as String?,
@@ -96,8 +102,8 @@ class UserResponse implements IModel {
         status: (map['status'] as int) == 1,
         remember:
             ((map['remember'] as int?) ?? 0) == 1, // cast as int? then default
-        createdAt: map['created_at'] as String,
-        updatedAt: map['updated_at'] as String,
+        createdAt: strToDt(map['created_at'] as String),
+        updatedAt: strToDt(map['updated_at'] as String),
       );
 
   @override
@@ -105,7 +111,7 @@ class UserResponse implements IModel {
         if (id != null) 'id': id,
         'name': name,
         'email': email,
-        'dob': dob,
+        'dob': dob.toIso8601String(),
         'sex': sex.code,
         'avatar': avatar,
         'phone': phone,

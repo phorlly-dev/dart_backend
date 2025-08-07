@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InputField extends StatelessWidget {
   final String? label, name;
-  final IconData? icon;
   final int? maxLines;
   final double? width;
   final TextEditingController? controller;
@@ -20,7 +19,6 @@ class InputField extends StatelessWidget {
     this.width = 1,
     this.label,
     this.controller,
-    this.icon,
     this.iconColor,
     this.textColor,
     this.borderColor,

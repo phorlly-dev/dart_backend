@@ -1,5 +1,6 @@
 // import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:dart_backend/services/db_request.dart';
+import 'package:dart_backend/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -10,38 +11,38 @@ part 'extension_event.dart';
 // @CopyWith()
 class EventResponse implements IModel {
   // @CopyWithField(immutable: true)
-  int? id;
-  String title;
-  String? note;
+  final int? id;
+  final String title;
+  final String? note;
 
   @JsonKey(name: 'repeat_rule')
-  RepeatRule repeatRule;
+  final RepeatRule repeatRule;
 
   /// Stored in DB as INTEGER ARGB
-  @JsonKey(fromJson: _colorFromInt, toJson: _colorToInt)
-  Color color;
+  @JsonKey(name: 'color', fromJson: colorFromInt, toJson: colorToInt)
+  final Color color;
 
   /// Stored in DB as INTEGER
   @JsonKey(name: 'status')
-  Status status;
+  final Status status;
 
   @JsonKey(name: 'remind_min')
-  int remindMin;
+  final int remindMin;
 
-  @JsonKey(name: 'event_date')
-  String eventDate; // YYYY-MM-DD
+  @JsonKey(name: 'event_date', fromJson: strToDt, toJson: dtToStr)
+  final DateTime eventDate; // YYYY-MM-DD
 
-  @JsonKey(name: 'start_time')
-  String startTime; // ISO-8601 or "HH:mm"
+  @JsonKey(name: 'start_time', fromJson: strToDt, toJson: dtToStr)
+  final DateTime startTime; // ISO-8601 or "HH:mm"
 
-  @JsonKey(name: 'end_time')
-  String endTime;
+  @JsonKey(name: 'end_time', fromJson: strToDt, toJson: dtToStr)
+  final DateTime endTime;
 
-  @JsonKey(name: 'created_at')
-  String createdAt; // full timestamp
+  @JsonKey(name: 'created_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime createdAt; // full timestamp
 
-  @JsonKey(name: 'updated_at')
-  String updatedAt;
+  @JsonKey(name: 'updated_at', fromJson: strToDt, toJson: dtToStr)
+  final DateTime updatedAt;
 
   EventResponse({
     this.id,
@@ -55,10 +56,10 @@ class EventResponse implements IModel {
     required this.startTime,
     required this.endTime,
     // these will be filled by the DB defaults
-    String? createdAt,
-    String? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now().toIso8601String(),
-        updatedAt = updatedAt ?? DateTime.now().toIso8601String();
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : createdAt = createdAt ?? dtNow(),
+        updatedAt = updatedAt ?? dtNow();
 
   /// copyWith for easy updates
   EventResponse copyWith({
@@ -69,11 +70,11 @@ class EventResponse implements IModel {
     Color? color,
     Status? status,
     int? remindMin,
-    String? eventDate,
-    String? startTime,
-    String? endTime,
-    String? createdAt,
-    String? updatedAt,
+    DateTime? eventDate,
+    DateTime? startTime,
+    DateTime? endTime,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return EventResponse(
       id: id ?? this.id,
@@ -106,11 +107,11 @@ class EventResponse implements IModel {
         color: Color((m['color'] as int)),
         status: StatusX.fromCode(m['status'] as int),
         remindMin: m['remind_min'] as int,
-        eventDate: m['event_date'] as String,
-        startTime: m['start_time'] as String,
-        endTime: m['end_time'] as String,
-        createdAt: m['created_at'] as String,
-        updatedAt: m['updated_at'] as String,
+        eventDate: strToDt(m['event_date'] as String),
+        startTime: strToDt(m['start_time'] as String),
+        endTime: strToDt(m['end_time'] as String),
+        createdAt: strToDt(m['created_at'] as String),
+        updatedAt: strToDt(m['updated_at'] as String),
       );
 
   /// DbModel: convert to a map for inserts/updates
@@ -123,17 +124,13 @@ class EventResponse implements IModel {
       'color': color.toARGB32(),
       'status': status.code,
       'remind_min': remindMin,
-      'event_date': eventDate,
-      'start_time': startTime,
-      'end_time': endTime,
+      'event_date': eventDate.toIso8601String(),
+      'start_time': startTime.toIso8601String(),
+      'end_time': endTime.toIso8601String(),
       // let SQLite use DEFAULT CURRENT_TIMESTAMP on create/update
     };
     if (id != null) map['id'] = id;
 
     return map;
   }
-
-  // helpers for json <-> Color
-  static Color _colorFromInt(int i) => Color(i);
-  static int _colorToInt(Color c) => c.toARGB32();
 }

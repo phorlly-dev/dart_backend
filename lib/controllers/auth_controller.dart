@@ -36,7 +36,7 @@ class AuthController extends GetxController {
   }
 
   /// LOGIN
-  Future<void> login(LoginResponse req, bool rememberMe) async {
+  Future<void> login(LoginResponse req) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
@@ -58,8 +58,8 @@ class AuthController extends GetxController {
       currentUser.value = user;
 
       // 4️⃣ Optionally remember me
-      if (rememberMe) {
-        final updated = user.copyWith(remember: true);
+      if (req.remember && currentUser.value != null) {
+        final updated = user.copyWith(remember: req.remember);
         await _helper.release(updated);
         currentUser.value = updated;
       }

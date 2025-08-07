@@ -1,7 +1,6 @@
 import 'package:dart_backend/controllers/user_controller.dart';
 import 'package:dart_backend/models/user_response.dart';
-import 'package:dart_backend/utils/index.dart';
-import 'package:dart_backend/views/widgets/components/input_form_builder.dart';
+import 'package:dart_backend/views/widgets/components/input_builder.dart';
 import 'package:dart_backend/views/widgets/components/submit_form_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -22,44 +21,44 @@ class ProfileForm extends StatelessWidget {
       onSubmit: () {},
       colorBtn: colors.secondary,
       iconBtn: Icons.update,
-      initValue: model.toJson(),
+      initVal: model.toJson(),
       children: [
-        InputFormBuilder(
+        InputBuilder(
           // isBorderd: true,
           name: 'name',
           label: 'Full Name',
         ),
-        InputFormBuilder(
+        InputBuilder(
           // isBorderd: true,
           name: 'email',
           label: 'Email Address',
           enabled: false,
           inputType: TextInputType.emailAddress,
         ),
-        InputFormBuilder(
+        InputBuilder(
           // isBorderd: true,
           name: 'phone',
           label: 'Phone Number',
         ),
-        InputFormBuilder(
+        InputBuilder(
           name: 'phone',
           label: 'Phone Number',
           inputType: TextInputType.phone,
         ),
-        InputFormBuilder(
-          name: 'createdAt',
-          label: 'Created At',
-          enabled: false,
-          initVal: dateStr(strDate(model.createdAt)),
-          inputType: TextInputType.datetime,
-        ),
-        InputFormBuilder(
-          initVal: dateStr(strDate(model.updatedAt)),
-          name: 'updatedAt',
-          label: 'Updated At',
-          inputType: TextInputType.datetime,
-          enabled: false,
-        ),
+        // InputBuilder(
+        //   name: 'createdAt',
+        //   label: 'Created At',
+        //   enabled: false,
+        //   initVal: dateStr(strDate(model.createdAt)),
+        //   inputType: TextInputType.datetime,
+        // ),
+        // InputBuilder(
+        //   initVal: dateStr(strDate(model.updatedAt)),
+        //   name: 'updatedAt',
+        //   label: 'Updated At',
+        //   inputType: TextInputType.datetime,
+        //   enabled: false,
+        // ),
       ],
     );
   }

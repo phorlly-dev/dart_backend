@@ -58,6 +58,11 @@ abstract class DbRequest<T extends IModel> {
   /// UPDATE → returns number of rows affected
   Future<int> release(T model) async {
     final db = await database;
+
+    // If your model has copyWith(updatedAt: …), do:
+    model = (model as dynamic)
+        .copyWith(updatedAt: DateTime.now().toIso8601String()) as T;
+
     final data = model.toMap();
 
     return db.update(tableName, data, where: 'id = ?', whereArgs: [data['id']]);

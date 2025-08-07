@@ -96,18 +96,19 @@ String getInitials(String name) {
   return initials.toUpperCase();
 }
 
-String timeStr(String name, {String? format}) =>
-    dateStr(strDate(name), format: format ?? 'h:mm a');
+String txToTm(String name, {String? format}) =>
+    dtToTx(strToDt(name), format: format ?? 'h:mm a');
 
-String dateStr(DateTime date, {String? format}) =>
+String dtToTm(DateTime name, {String? format}) =>
+    dtToTx(name, format: format ?? 'h:mm a');
+
+String dtToTx(DateTime date, {String? format}) =>
     DateFormat(format ?? 'd MMMM yyyy').format(date);
 
-DateTime strDate(String name) => DateTime.parse(name);
+DateTime dtNow() => DateTime.now();
 
-DateTime dateNow() => DateTime.now();
-
-bool dateCheck(String provided, DateTime selected) {
-  final str = strDate(provided);
+bool dtCheck(String provided, DateTime selected) {
+  final str = strToDt(provided);
   final providedDate = DateFormat.yMd().format(str);
   final selectedDate = DateFormat.yMd().format(selected);
 
@@ -118,7 +119,16 @@ bool dateCheck(String provided, DateTime selected) {
   return false;
 }
 
-int timeSplit(String time, int index) =>
+Color colorFromInt(int code) => Color(code);
+int colorToInt(Color code) => code.toARGB32();
+
+//from text to datetime
+DateTime strToDt(String str) => DateTime.parse(str);
+
+//datetime to text
+String dtToStr(DateTime dt) => dt.toIso8601String();
+
+int tmSplit(String time, int index) =>
     int.parse(time.toString().split(':')[index]);
 
 /// Tries to load an argument of type [T] from Get.arguments.

@@ -7,7 +7,6 @@ import 'package:dart_backend/views/partials/event_card.dart';
 import 'package:dart_backend/views/widgets/components/action_button.dart';
 import 'package:dart_backend/views/widgets/components/select_option.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 
@@ -32,12 +31,16 @@ class Schedule extends StatelessWidget {
                   children: [
                     ActionButton(
                       borderRadius: 8,
+                      width: 12,
+                      hieght: 16,
                       label: 'Today',
                       icon: Icons.today,
                       onSubmit: () => ctrl.selectedDate.value = DateTime.now(),
                     ),
                     ActionButton(
                       label: 'Add New',
+                      width: 16,
+                      hieght: 16,
                       icon: Icons.add_circle,
                       color: colors.inversePrimary,
                       onSubmit: () async {
@@ -102,7 +105,7 @@ class Schedule extends StatelessWidget {
                   var selected = ctrl.selectedDate.value;
                   // does any event fall on that selected day?
                   final hasEvent = ctrl.states.any((e) {
-                    final d = DateTime.parse(e.eventDate);
+                    final d = e.eventDate;
                     return d.year == selected.year &&
                         d.month == selected.month &&
                         d.day == selected.day;
@@ -116,7 +119,7 @@ class Schedule extends StatelessWidget {
                         DateTime.now().add(const Duration(days: 365 * 1000)),
                     eventDates: ctrl.states
                         .map((e) {
-                          final d = DateTime.parse(e.eventDate);
+                          final d = e.eventDate;
                           return DateTime(d.year, d.month, d.day);
                         })
                         .toSet()
@@ -200,7 +203,7 @@ class Schedule extends StatelessWidget {
 
     showSottomShee(height: .2, children: [
       ActionButton(
-        width: .8.w,
+        width: 280,
         label: 'Edit',
         color: colors.outline,
         icon: Icons.edit_document,
@@ -215,7 +218,7 @@ class Schedule extends StatelessWidget {
         },
       ),
       ActionButton(
-        width: .8.w,
+        width: 280,
         color: colors.error,
         label: 'Delete',
         icon: Icons.delete,
@@ -233,7 +236,7 @@ class Schedule extends StatelessWidget {
         },
       ),
       ActionButton(
-        width: .8.w,
+        width: 280,
         label: 'Close',
         color: colors.scrim,
         icon: Icons.close,

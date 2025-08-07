@@ -48,7 +48,7 @@ class EventController extends GetxController {
     final stat = selectedStatus.value;
 
     final v = states.where((e) {
-      final sameDay = DateTime.parse(e.eventDate);
+      final sameDay = e.eventDate;
       final matchesDate = DateTime(sameDay.year, sameDay.month, sameDay.day) ==
           DateTime(date.year, date.month, date.day);
       final matchesRepeat = (rep == RepeatRule.none) || e.repeatRule == rep;
@@ -67,8 +67,8 @@ class EventController extends GetxController {
 
     final now = tz.TZDateTime.now(tz.local);
     for (final e in filteredEvents) {
-      final dt = DateTime.parse(e.eventDate);
-      final start = DateTime.parse(e.startTime);
+      final dt = e.eventDate;
+      final start = e.startTime;
 
       var scheduled = tz.TZDateTime(
         tz.local,
@@ -154,6 +154,33 @@ class EventController extends GetxController {
 
       states.add(res);
       states.refresh();
+
+      errorMessage.value = '';
+    } catch (e) {
+      errorMessage.value = 'Could not create record: ${e.toString()}';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// CREATE OR UPDATE
+  Future<void> saveChange(EventResponse req) async {
+    try {
+      isLoading.value = true;
+      if (req.id == null) {
+        final res = await _db.make(req);
+
+        states.add(res);
+        states.refresh();
+      } else {
+        await _db.release(req);
+
+        final idx = states.indexWhere((res) => res.id == req.id);
+        if (idx != -1) {
+          states[idx] = req;
+          states.refresh();
+        }
+      }
 
       errorMessage.value = '';
     } catch (e) {
