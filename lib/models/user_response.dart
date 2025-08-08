@@ -87,6 +87,23 @@ class UserResponse implements IModel {
       _$UserResponseFromJson(json);
   Map<String, dynamic> toJson() => _$UserResponseToJson(this);
 
+  factory UserResponse.formData(Map<String, dynamic> form) => UserResponse(
+        id: form['id'] as int?,
+        name: form['name'] as String,
+        email: form['email'] as String,
+        dob: form['dob'] != null ? strToDt(form['dob'] as String) : null,
+        sex: SexX.fromCode(form['sex'] as int),
+        avatar: form['avatar'] as String?,
+        phone: form['phone'] as String?,
+        password: form['password'] as String,
+        role: (form['role'] as int) == 1,
+        status: (form['status'] as int) == 1,
+        remember:
+            ((form['remember'] as int?) ?? 0) == 1, // cast as int? then default
+        createdAt: parseOrNow(form['created_at'] as String?),
+        updatedAt: parseOrNow(form['updated_at'] as String?),
+      );
+
   // DbModel
   @override
   UserResponse fromMap(Map<String, dynamic> map) => UserResponse(
@@ -102,8 +119,8 @@ class UserResponse implements IModel {
         status: (map['status'] as int) == 1,
         remember:
             ((map['remember'] as int?) ?? 0) == 1, // cast as int? then default
-        createdAt: strToDt(map['created_at'] as String),
-        updatedAt: strToDt(map['updated_at'] as String),
+        createdAt: parseOrNow(map['created_at'] as String?),
+        updatedAt: parseOrNow(map['updated_at'] as String?),
       );
 
   @override

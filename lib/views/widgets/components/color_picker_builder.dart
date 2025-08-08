@@ -6,14 +6,12 @@ class ColorPickerBuilder<T extends Color> extends StatelessWidget {
   final String name;
   final T? initVal;
   final String? label;
-  final Function(Color? val)? formatVal;
 
   const ColorPickerBuilder({
     super.key,
     required this.name,
     this.initVal,
     this.label,
-    this.formatVal,
   });
 
   @override
@@ -21,7 +19,7 @@ class ColorPickerBuilder<T extends Color> extends StatelessWidget {
     return FormBuilderField<Color>(
       name: name,
       initialValue: initVal ?? Colors.green,
-      valueTransformer: formatVal,
+      valueTransformer: (value) => (value as Color).toARGB32(),
       builder: (field) {
         return InputDecorator(
           decoration: InputDecoration(

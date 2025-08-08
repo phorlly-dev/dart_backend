@@ -98,6 +98,22 @@ class TaskResponse implements IModel {
       _$TaskResponseFromJson(json);
   Map<String, dynamic> toJson() => _$TaskResponseToJson(this);
 
+  factory TaskResponse.formData(Map<String, dynamic> form) => TaskResponse(
+        id: form['id'] as int?,
+        name: form['name'] as String,
+        note: form['note'] as String?,
+        dueDate: strToDt(form['due_date'] as String),
+        attachments: form['attachments'] as String?,
+        assignedTo: form['assigned_to'] as int,
+        color: Color((form['color'] as int)),
+        status: StatusX.fromCode(form['status'] as int),
+        priority: PriorityX.fromCode(form['priority'] as int),
+        startedAt: strToDt(form['started_at'] as String),
+        endedAt: strToDt(form['ended_at'] as String),
+        createdAt: parseOrNow(form['created_at'] as String),
+        updatedAt: parseOrNow(form['updated_at'] as String),
+      );
+
   /// sqflite uses 0/1 for booleans
   @override
   TaskResponse fromMap(Map<String, dynamic> map) => TaskResponse(
@@ -112,8 +128,8 @@ class TaskResponse implements IModel {
         priority: PriorityX.fromCode(map['priority'] as int),
         startedAt: strToDt(map['started_at'] as String),
         endedAt: strToDt(map['ended_at'] as String),
-        createdAt: strToDt(map['created_at'] as String),
-        updatedAt: strToDt(map['updated_at'] as String),
+        createdAt: parseOrNow(map['created_at'] as String),
+        updatedAt: parseOrNow(map['updated_at'] as String),
       );
 
   @override

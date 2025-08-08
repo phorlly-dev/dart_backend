@@ -63,49 +63,64 @@ class _EventFormState extends State<EventForm> {
           maxLines: 2,
           initVal: _model?.note ?? '',
         ),
-        ColorPickerBuilder(name: 'color', initVal: _model?.color),
+        ColorPickerBuilder(
+          name: 'color',
+          initVal: _model?.color,
+        ),
       ],
       onSubmit: () async {
         final formState = _formKey.currentState;
-        if (formState?.saveAndValidate() ?? false) {
-          final data = formState!.value;
-          debugPrint('Ev:  $data');
-          final err = _controller.errorMessage.value;
-          final req = EventResponse.fromJson(data);
+        final err = _controller.errorMessage.value;
 
-          await _controller.saveChange(req);
+        if (formState == null) return;
+        if (!formState.saveAndValidate()) {
+          // show errors in the UI
+          return;
+        }
 
-          if (!context.mounted) return;
-          if (err.isNotEmpty) {
-            showToast(
-              context,
-              type: Toast.error,
-              autoClose: 5,
-              title: 'Create Or Update Failed!',
-              message: err,
-            );
-            debugPrint(err);
-          } else if (isCreate) {
-            showToast(
-              context,
-              type: Toast.info,
-              title: 'Posted!',
-              message: 'Created successfully.',
-            );
+        final data = Map<String, dynamic>.from(formState.value);
+        // reinject the id for update mode:
+        if (!isCreate) {
+          data['id'] = _model!.id;
+        } else {
+          // Ensure we don’t accidentally carry over an old ID:
+          data.remove('id');
+        }
 
-            await _controller.index();
-            _formKey.currentState!.reset();
-            Get.back();
-          } else {
-            showToast(
-              context,
-              title: 'Changed!',
-              message: 'Updated successfully.',
-            );
+        final req = EventResponse.formData(data);
 
-            _formKey.currentState!.reset();
-            Get.back();
-          }
+        await _controller.saveChange(req);
+
+        if (!context.mounted) return;
+        if (err.isNotEmpty) {
+          showToast(
+            context,
+            type: Toast.error,
+            autoClose: 5,
+            title: 'Create Or Update Failed!',
+            message: err,
+          );
+          debugPrint(err);
+        } else if (isCreate) {
+          showToast(
+            context,
+            type: Toast.info,
+            title: 'Posted!',
+            message: 'Created successfully.',
+          );
+
+          await _controller.index();
+          _formKey.currentState!.reset();
+          Get.back();
+        } else {
+          showToast(
+            context,
+            title: 'Changed!',
+            message: 'Updated successfully.',
+          );
+
+          _formKey.currentState!.reset();
+          Get.back();
         }
       },
     );
@@ -168,7 +183,7 @@ class _EventFormState extends State<EventForm> {
           name: 'repeat_rule',
           label: 'Repeat',
           initVal: _model?.repeatRule ?? RepeatRule.none,
-          formatVal: (val) => val?.code,
+          formatVal: (val) => (val as RepeatRule).code,
           options: RepeatRule.values.map((item) {
             return DropdownMenuItem<RepeatRule>(
               value: item,
@@ -186,7 +201,7 @@ class _EventFormState extends State<EventForm> {
           label: 'Status',
           name: 'status',
           initVal: _model?.status ?? Status.pending,
-          formatVal: (val) => val?.code,
+          formatVal: (val) => (val as Status).code,
           options: Status.values.map((item) {
             return DropdownMenuItem<Status>(
               value: item,

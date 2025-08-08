@@ -165,26 +165,28 @@ class EventController extends GetxController {
 
   /// CREATE OR UPDATE
   Future<void> saveChange(EventResponse req) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
     try {
-      isLoading.value = true;
       if (req.id == null) {
-        final res = await _db.make(req);
-
-        states.add(res);
-        states.refresh();
+        // → CREATE
+        final created = await _db.make(req);
+        // insert at top so newest appears first:
+        states.insert(0, created);
       } else {
-        await _db.release(req);
+        // → UPDATE: stamp the new updatedAt
+        final updated = req.copyWith(updatedAt: DateTime.now());
+        await _db.release(updated);
 
-        final idx = states.indexWhere((res) => res.id == req.id);
+        // find & replace
+        final idx = states.indexWhere((e) => e.id == updated.id);
         if (idx != -1) {
-          states[idx] = req;
-          states.refresh();
+          states[idx] = updated;
         }
       }
-
-      errorMessage.value = '';
     } catch (e) {
-      errorMessage.value = 'Could not create record: ${e.toString()}';
+      errorMessage.value = 'Could not save event: $e';
     } finally {
       isLoading.value = false;
     }

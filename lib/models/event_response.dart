@@ -97,6 +97,21 @@ class EventResponse implements IModel {
       _$EventResponseFromJson(json);
   Map<String, dynamic> toJson() => _$EventResponseToJson(this);
 
+  factory EventResponse.formData(Map<String, dynamic> form) => EventResponse(
+        id: form['id'] as int?,
+        title: form['title'] as String,
+        note: form['note'] as String?,
+        repeatRule: RepeatRuleX.fromCode(form['repeat_rule'] as int),
+        color: Color((form['color'] as int)),
+        status: StatusX.fromCode(form['status'] as int),
+        remindMin: form['remind_min'] as int,
+        eventDate: strToDt(form['event_date'] as String),
+        startTime: strToDt(form['start_time'] as String),
+        endTime: strToDt(form['end_time'] as String),
+        createdAt: parseOrNow(form['created_at'] as String?),
+        updatedAt: parseOrNow(form['updated_at'] as String?),
+      );
+
   /// DbModel: build from a DB row
   @override
   EventResponse fromMap(Map<String, dynamic> m) => EventResponse(
@@ -110,8 +125,8 @@ class EventResponse implements IModel {
         eventDate: strToDt(m['event_date'] as String),
         startTime: strToDt(m['start_time'] as String),
         endTime: strToDt(m['end_time'] as String),
-        createdAt: strToDt(m['created_at'] as String),
-        updatedAt: strToDt(m['updated_at'] as String),
+        createdAt: parseOrNow(m['created_at'] as String?),
+        updatedAt: parseOrNow(m['updated_at'] as String?),
       );
 
   /// DbModel: convert to a map for inserts/updates

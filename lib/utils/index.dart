@@ -119,6 +119,15 @@ bool dtCheck(String provided, DateTime selected) {
   return false;
 }
 
+DateTime parseOrNow(String? str) {
+  if (str == null || str.isEmpty) return DateTime.now();
+  try {
+    return DateTime.parse(str);
+  } catch (_) {
+    return DateTime.now();
+  }
+}
+
 Color colorFromInt(int code) => Color(code);
 int colorToInt(Color code) => code.toARGB32();
 
